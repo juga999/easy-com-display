@@ -145,7 +145,7 @@
   </profiles>
 
   <build>
-    <finalName>ecd-${version}</finalName>
+    <finalName>ecd-${project.version}</finalName>
 
     <filters>
       <filter>profiles/${build.profile.id}/config.properties</filter>
