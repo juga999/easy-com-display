@@ -1,0 +1,300 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.chorem</groupId>
+  <artifactId>ecd</artifactId>
+  <packaging>jar</packaging>
+  <version>1.0-SNAPSHOT</version>
+  <name>EasyComDisplay</name>
+
+  <properties>
+    <javaVersion>1.8</javaVersion>
+    <junitVersion>4.12</junitVersion>
+    <sparkVersion>2.5</sparkVersion>
+    <guavaVersion>22.0</guavaVersion>
+    <gsonVersion>2.8.0</gsonVersion>
+    <weldVersion>3.0.0.Final</weldVersion>
+    <jwtAuthVersion>3.2.0</jwtAuthVersion>
+    <slf4jVersion>1.7.13</slf4jVersion>
+    <tomcatJdbcVersion>9.0.0.M25</tomcatJdbcVersion>
+    <postgresDriverVersion>42.1.1</postgresDriverVersion>
+    <jooqVersion>3.9.5</jooqVersion>
+  </properties>
+
+  <repositories>
+    <repository>
+      <id>JBoss repository</id>
+      <url>http://repository.jboss.org/nexus/content/groups/public/</url>
+    </repository>
+  </repositories>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>${guavaVersion}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+      <version>${gsonVersion}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.auth0</groupId>
+      <artifactId>java-jwt</artifactId>
+      <version>${jwtAuthVersion}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.sparkjava</groupId>
+      <artifactId>spark-core</artifactId>
+      <version>${sparkVersion}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jboss.weld.se</groupId>
+      <artifactId>weld-se-core</artifactId>
+      <version>${weldVersion}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <version>${slf4jVersion}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.tomcat</groupId>
+      <artifactId>tomcat-jdbc</artifactId>
+      <version>${tomcatJdbcVersion}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>${postgresDriverVersion}</version>
+    </dependency>
+
+    <!--<dependency>
+      <groupId>javax</groupId>
+      <artifactId>javaee-web-api</artifactId>
+      <version>7.0</version>
+    </dependency>-->
+
+    <dependency>
+      <groupId>org.jooq</groupId>
+      <artifactId>jooq</artifactId>
+      <version>${jooqVersion}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>2.5</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-exec</artifactId>
+      <version>1.3</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jdom</groupId>
+      <artifactId>jdom2</artifactId>
+      <version>2.0.6</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jsoup</groupId>
+      <artifactId>jsoup</artifactId>
+      <version>1.10.2</version>
+    </dependency>
+
+    <!-- Unit Test -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>${junitVersion}</version>
+      <scope>test</scope>
+    </dependency>
+
+  </dependencies>
+
+  <profiles>
+    <profile>
+      <id>dev</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <build.profile.id>dev</build.profile.id>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>prod</id>
+      <properties>
+        <build.profile.id>prod</build.profile.id>
+      </properties>
+    </profile>
+  </profiles>
+
+  <build>
+    <finalName>ecd-${version}</finalName>
+
+    <filters>
+      <filter>profiles/${build.profile.id}/config.properties</filter>
+    </filters>
+
+    <resources>
+      <resource>
+        <filtering>true</filtering>
+        <directory>src/main/resources</directory>
+        <excludes>
+          <exclude>public/**</exclude>
+        </excludes>
+      </resource>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>false</filtering>
+        <includes>
+          <include>public/**</include>
+        </includes>
+      </resource>
+    </resources>
+
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.5.1</version>
+        <configuration>
+          <source>${javaVersion}</source>
+          <target>${javaVersion}</target>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.jooq</groupId>
+        <artifactId>jooq-codegen-maven</artifactId>
+        <version>${jooqVersion}</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+          </execution>
+        </executions>
+        <dependencies>
+          <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>${postgresDriverVersion}</version>
+          </dependency>
+        </dependencies>
+        <configuration>
+          <!-- JDBC connection parameters -->
+          <jdbc>
+            <driver>org.postgresql.Driver</driver>
+            <url>jdbc:postgresql:ecd</url>
+            <user>ecd</user>
+            <password>ecd</password>
+          </jdbc>
+          <!-- Generator parameters -->
+          <generator>
+            <database>
+              <name>org.jooq.util.postgres.PostgresDatabase</name>
+              <includes>.*</includes>
+              <excludes></excludes>
+              <inputSchema>public</inputSchema>
+            </database>
+            <target>
+              <packageName>org.chorem.ecd.mapping</packageName>
+              <directory>target/generated-sources/jooq</directory>
+            </target>
+          </generator>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>1.6.0</version>
+        <executions>
+          <execution>
+            <id>client-build</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>exec</goal>
+            </goals>
+            <configuration>
+              <executable>vue-build</executable>
+              <workingDirectory>${basedir}/src/main/web</workingDirectory>
+              <arguments>
+                <argument>--prod</argument>
+                <argument>src/index.js</argument>
+              </arguments>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>3.0.2</version>
+        <executions>
+          <execution>
+            <id>copy-resources</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/classes/public</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>src/main/web/dist</directory>
+                  <filtering>false</filtering>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>appassembler-maven-plugin</artifactId>
+        <version>2.0.0</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>assemble</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <assembleDirectory>${project.build.directory}/ecd-app</assembleDirectory>
+          <programs>
+            <program>
+              <name>EasyComDisplay</name>
+              <mainClass>org.chorem.ecd.App</mainClass>
+            </program>
+          </programs>
+          <platforms>
+            <platform>unix</platform>
+          </platforms>
+        </configuration>
+      </plugin>
+
+    </plugins>
+  </build>
+
+</project>
