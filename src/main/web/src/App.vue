@@ -1,34 +1,30 @@
 <template>
-    <div id="app">
-        <router-view></router-view>
-    </div>
+  <div id="app">
+    <router-view></router-view>
+  </div>
 </template>
 
 <script>
 export default {
-    name: 'app',
-    data () {
-        return {}
-    },
-
-    methods: {
-    }
+  name: 'app'
 }
 </script>
 
 <style>
 @font-face {
   font-family: 'RobotoRegular';
-  src: url('../assets/fonts/Roboto-Regular.ttf') format('truetype');
+  src: url('./assets/fonts/Roboto-Regular.ttf') format('truetype');
 }
 
 @font-face {
   font-family: 'RobotoBold';
-  src: url('../assets/fonts/Roboto-Bold.ttf') format('truetype');
+  src: url('./assets/fonts/Roboto-Bold.ttf') format('truetype');
 }
 
-body {
-    font-family: 'RobotoRegular';
+#app {
+  font-family: 'RobotoRegular';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 h3 {

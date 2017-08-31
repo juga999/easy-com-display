@@ -1,6 +1,6 @@
 # ecd-client
 
-> EasyComDispaly client
+> Web client for the EasyComDisplay application
 
 ## Build Setup
 

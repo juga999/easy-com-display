@@ -3,7 +3,7 @@
         <div class="col-sm-2 navigation-pane">
             <b-list-group>
                 <b-list-group-item>
-                    <router-link to="/cms">
+                    <router-link to="/admin">
                         <span class="navigation-menu-entry-icon"><i class="fa fa-reply"></i></span>
                         Retour
                     </router-link>
@@ -50,7 +50,7 @@
 </template>
 
 <script>
-import CmsService from '../services/CmsService.js'
+import CmsService from '@/services/CmsService.js'
 
 export default {
     data() {

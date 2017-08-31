@@ -8,12 +8,6 @@ Prérequis Développeur
 Préparer l'application
 ======================
 
-Vue CLI
--------
-``̀
-sudo npm install -g vue-cli
-``̀
-
 Database
 --------
 
@@ -42,11 +36,11 @@ Lancement de l'application
 Frontend
 --------
 
-Dans le répertoire lancer la commande suivate:
+Dans le répertoire lancer la commande suivante:
 ```
-vue-build -c vue-cli.config.js ./src/index.js
+npm run dev
 ```
-Cela lancera un serveur sur le port 4000 pour le développement du frontend. Les requêtes au backend seront routées sur le port 8084.
+Cela lancera un serveur sur le port 8080 pour le développement du frontend. Les requêtes au backend seront routées sur le port 8084.
 
 Backend
 -------

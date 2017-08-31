@@ -20,7 +20,7 @@
 
 <script>
 import Q from 'q'
-import CmsService from '../services/CmsService.js'
+import CmsService from '@/services/CmsService.js'
 
 import Clock from './Clock.vue'
 import NewsTicker from './NewsTicker.vue'
@@ -132,7 +132,7 @@ export default {
     left: 0;
     bottom:0;
     right: 0;
-    background-image: url('../assets/background.jpg');
+    background-image: url('/static/background.jpg');
     background-size: cover;
 }
 

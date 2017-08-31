@@ -43,15 +43,15 @@
 </template>
 
 <script>
-import CmsService from '../../services/CmsService.js'
+import CmsService from '@/services/CmsService.js'
 
-import FileImportModal from './FileImportModal.vue'
-import NewsFeedAddModal from './NewsFeedAddModal.vue'
+import FileImportModal from '@/components/admin/FileImportModal.vue'
+import NewsFeedAddModal from '@/components/admin/NewsFeedAddModal.vue'
 
-import StreamList from './StreamList.vue'
-import NewsFeedList from './NewsFeedList.vue'
-import PowerManagement from './PowerManagement.vue'
-import ThisLocation from './Location.vue'
+import StreamList from '@/components/admin/StreamList.vue'
+import NewsFeedList from '@/components/admin/NewsFeedList.vue'
+import PowerManagement from '@/components/admin/PowerManagement.vue'
+import ThisLocation from '@/components/admin/Location.vue'
 
 export default {
     components: {

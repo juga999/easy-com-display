@@ -233,11 +233,11 @@
               <goal>exec</goal>
             </goals>
             <configuration>
-              <executable>vue-build</executable>
+              <executable>npm</executable>
               <workingDirectory>${basedir}/src/main/web</workingDirectory>
               <arguments>
-                <argument>--prod</argument>
-                <argument>src/index.js</argument>
+                <argument>run</argument>
+                <argument>build</argument>
               </arguments>
             </configuration>
           </execution>

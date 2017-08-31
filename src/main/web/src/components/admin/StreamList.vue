@@ -30,9 +30,9 @@
 </template>
 
 <script>
-import CmsService from '../../services/CmsService.js'
+import CmsService from '@/services/CmsService.js'
 
-import StreamDeletionConfirmModal from './StreamDeletionConfirmModal'
+import StreamDeletionConfirmModal from '@/components/admin/StreamDeletionConfirmModal'
 
 export default {
     components: {

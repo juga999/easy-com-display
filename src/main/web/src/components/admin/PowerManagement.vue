@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import PowerManagementService from '../../services/PowerManagementService.js'
+import PowerManagementService from '@/services/PowerManagementService.js'
 
 export default {
     data() {

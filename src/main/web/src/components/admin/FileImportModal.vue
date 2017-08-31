@@ -46,7 +46,7 @@
 </template>
 
 <script>
-import CmsService from '../../services/CmsService.js'
+import CmsService from '@/services/CmsService.js'
 
 export default {
     data() {

@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import LocationService from '../../services/LocationService.js'
+import LocationService from '@/services/LocationService.js'
 
 export default {
     data() {
