@@ -30,6 +30,7 @@
 </template>
 
 <script>
+import { EventBus } from '@/services/EventBus.js';
 import CmsService from '@/services/CmsService.js'
 
 import StreamDeletionConfirmModal from '@/components/admin/StreamDeletionConfirmModal'
@@ -52,16 +53,11 @@ export default {
         this.getStreamList();
         this.getCurrentStreamId();
 
-        /*this.refreshId = window.setInterval(() => {
-            this.getStreamList();
-            this.getCurrentStreamId();
-        }, 1500);*/
+        EventBus.$on('newStreamEvent', this.onNewStream);
     },
 
     beforeDestroy() {
-        if (this.refreshId) {
-            window.clearInterval(this.refreshId);
-        }
+        EventBus.$off('newStreamEvent', this.onNewStream);
     },
 
     methods: {
@@ -93,6 +89,10 @@ export default {
                 return this.getStreamList()
             });
         },
+
+        onNewStream() {
+            this.getStreamList();
+        }
     }
 }
 </script>

@@ -1,6 +1,8 @@
 import Vue from 'vue'
 import VueResource from 'vue-resource'
 
+import { EventBus } from '@/services/EventBus.js';
+
 Vue.use(VueResource);
 
 const CMS_API_ROOT = '/api/ecd/cms/'
@@ -88,6 +90,7 @@ export default {
 
         return new Promise(function(resolve, reject) {
             Vue.http.post(CMS_API_ROOT + 'streams', formData).then((response) => {
+                EventBus.$emit('newStreamEvent', response.body.streamId);
                 resolve(response.body);
             }, (response) => {
                 console.log(response.body);
@@ -114,6 +117,7 @@ export default {
 
         return new Promise(function(resolve, reject) {
             Vue.http.post(CMS_API_ROOT + 'newsfeeds', formData).then((response) => {
+                EventBus.$emit('newNewsFeedEvent', response.body.newsFeedId);
                 resolve(response.body);
             }, (response) => {
                 console.log(response.body);

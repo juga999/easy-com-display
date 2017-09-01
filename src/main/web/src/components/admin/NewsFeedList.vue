@@ -19,6 +19,7 @@
 </template>
 
 <script>
+import { EventBus } from '@/services/EventBus.js';
 import CmsService from '@/services/CmsService.js'
 
 export default {
@@ -31,9 +32,7 @@ export default {
     mounted() {
         this.getNewsFeedList();
 
-        /*this.refreshId = window.setInterval(() => {
-            this.getNewsFeedList();
-        }, 1500);*/
+        EventBus.$on('newNewsFeedEvent', this.onNewNewsFeed);
     },
 
     beforeDestroy() {
@@ -53,10 +52,13 @@ export default {
             return CmsService.deleteNewsFeed(newsFeedId).then(() => {
                 return this.getNewsFeedList();
             })
+        },
+
+        onNewNewsFeed() {
+            this.getNewsFeedList();
         }
     }
 }
-
 </script>
 
 <style scoped>
@@ -84,5 +86,4 @@ export default {
 td.newsfeed-name {
     width: 80%;
 }
-
 </style>

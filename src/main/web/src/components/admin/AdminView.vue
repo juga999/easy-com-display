@@ -1,20 +1,16 @@
 <template>
     <div>
         <b-navbar toggleable type="inverse" class="admin-navbar">
-            <file-import-modal></file-import-modal>
-            <news-feed-add-modal></news-feed-add-modal>
-
             <b-nav-toggle target="nav_collapse"></b-nav-toggle>
-
             <b-collapse is-nav id="nav_collapse">
                 <b-nav is-nav-bar>
                     <b-nav-item>
-                        <b-link @click="importPresentation">
+                        <b-link v-b-modal.presentationImportModal>
                             <span><i class="fa fa-cloud-download"></i>&nbsp;Importer une présentation</span>
                         </b-link>
                     </b-nav-item>
                     <b-nav-item>
-                        <b-link @click="addNewsFeed">
+                        <b-link v-b-modal.newsFeedAddModal>
                             <span><i class="fa fa-rss-square"></i>&nbsp;Ajouter un flux d'actualités</span>
                         </b-link>
                     </b-nav-item>
@@ -39,14 +35,42 @@
                 <this-location></this-location>
             </div>
         </div>
+
+        <!-- Modal pour importer un présentation -->
+        <b-modal id="presentationImportModal"
+                 ref="presentationImportModal"
+                 title="Importer une présentation" 
+                 size="lg">
+            <presentation-import-form></presentation-import-form>
+            <div slot="modal-footer">
+                <b-btn variant="secondary" @click="closePresentationImportModal">
+                    Fermer
+                </b-btn>
+            </div>
+        </b-modal>
+
+        <!-- Modal pour ajouter un flux RSS -->
+        <b-modal id="newsFeedAddModal"
+                 ref="newsFeedAddModal"
+                 title="Ajouter un flux d'actualités"
+                 size="lg">
+            <news-feed-add-form></news-feed-add-form>
+            <div slot="modal-footer">
+                <b-btn variant="secondary" @click="closeNewsFeedAddModal">
+                    Fermer
+                </b-btn>
+            </div>
+        </b-modal>
     </div>
 </template>
 
 <script>
+import { EventBus } from '@/services/EventBus.js';
+
 import CmsService from '@/services/CmsService.js'
 
-import FileImportModal from '@/components/admin/FileImportModal.vue'
-import NewsFeedAddModal from '@/components/admin/NewsFeedAddModal.vue'
+import PresentationImportForm from '@/components/admin/PresentationImportForm.vue'
+import NewsFeedAddForm from '@/components/admin/NewsFeedAddForm.vue'
 
 import StreamList from '@/components/admin/StreamList.vue'
 import NewsFeedList from '@/components/admin/NewsFeedList.vue'
@@ -55,8 +79,8 @@ import ThisLocation from '@/components/admin/Location.vue'
 
 export default {
     components: {
-        'file-import-modal': FileImportModal,
-        'news-feed-add-modal': NewsFeedAddModal,
+        'presentation-import-form': PresentationImportForm,
+        'news-feed-add-form': NewsFeedAddForm,
         'stream-list': StreamList,
         'newsfeed-list': NewsFeedList,
         'power-management': PowerManagement,
@@ -68,15 +92,30 @@ export default {
     },
 
     mounted() {
+        EventBus.$on('newStreamEvent', this.onNewStream);
+        EventBus.$on('newNewsFeedEvent', this.onNewNewsFeed);
+    },
+
+    beforeDestroy() {
+        EventBus.$off('newStreamEvent', this.onNewStream);
+        EventBus.$off('newNewsFeedEvent', this.onNewNewsFeed);
     },
 
     methods: {
-        importPresentation() {
-            this.$root.$emit('show::modal', 'fileImportModal');
+        onNewStream(streamId) {
+            this.closePresentationImportModal();
         },
 
-        addNewsFeed() {
-            this.$root.$emit('show::modal', 'newsFeedAddModal');
+        onNewNewsFeed(newsFeedId) {
+            this.closeNewsFeedAddModal();
+        },
+
+        closePresentationImportModal() {
+            this.$refs.presentationImportModal.hide();
+        },
+
+        closeNewsFeedAddModal() {
+            this.$refs.newsFeedAddModal.hide();
         }
     }
 }
