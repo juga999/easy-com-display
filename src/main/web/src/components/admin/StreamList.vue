@@ -11,7 +11,8 @@
                     </div>
                     <div v-if="stream.frames" class="admin-stream-item-thumbnail">
                         <router-link :to="{ name: 'stream-detail', params: { id: stream.id }}">
-                            <img :src="CmsService.getFrameThumbnailSource(stream, 0)">
+                            <img v-if="stream.frames.length > 0" :src="CmsService.getFrameThumbnailSource(stream, 0)">
+                            <span v-if="stream.frames.length == 0" class="empty-stream-thumbnail"><i class="fa fa-folder fa-5x"></i></span>
                         </router-link>
                     </div>
                     <div v-if="stream.frames">
@@ -123,5 +124,9 @@ export default {
 
 .admin-stream-trash {
     float: right;
+}
+
+.empty-stream-thumbnail {
+    color: #dcdcdc;
 }
 </style>

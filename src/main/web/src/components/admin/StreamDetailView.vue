@@ -22,6 +22,9 @@
             <div class="row">
                 <div class="col-md-8">
                     <div class="stream-thumbnail-list">
+                        <div class="stream-thumbnail">
+                            TODO
+                        </div>
                         <div class="stream-thumbnail" v-for="(frame, index) in stream.frames">
                             <img :src="CmsService.getFrameThumbnailSource(stream, index)">
                         </div>

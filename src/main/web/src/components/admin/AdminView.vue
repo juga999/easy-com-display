@@ -5,6 +5,11 @@
             <b-collapse is-nav id="nav_collapse">
                 <b-nav is-nav-bar>
                     <b-nav-item>
+                        <b-link v-b-modal.streamAddModal>
+                            <span><i class="fa fa-plus-square"></i>&nbsp;Créer une présentation</span>
+                        </b-link>
+                    </b-nav-item>
+                    <b-nav-item>
                         <b-link v-b-modal.presentationImportModal>
                             <span><i class="fa fa-cloud-download"></i>&nbsp;Importer une présentation</span>
                         </b-link>
@@ -35,6 +40,19 @@
                 <this-location></this-location>
             </div>
         </div>
+
+        <!-- Modal pour ajouter un flux d'information -->
+        <b-modal id="streamAddModal"
+                 ref="streamAddModal"
+                 title="Créer un fil d'annonces" 
+                 size="lg">
+            <stream-add-form></stream-add-form>
+            <div slot="modal-footer">
+                <b-btn variant="secondary" @click="closeStreamAddModal">
+                    Fermer
+                </b-btn>
+            </div>
+        </b-modal>
 
         <!-- Modal pour importer un présentation -->
         <b-modal id="presentationImportModal"
@@ -69,6 +87,7 @@ import { EventBus } from '@/services/EventBus.js';
 
 import CmsService from '@/services/CmsService.js'
 
+import StreamAddForm from '@/components/admin/StreamAddForm.vue'
 import PresentationImportForm from '@/components/admin/PresentationImportForm.vue'
 import NewsFeedAddForm from '@/components/admin/NewsFeedAddForm.vue'
 
@@ -79,6 +98,7 @@ import ThisLocation from '@/components/admin/Location.vue'
 
 export default {
     components: {
+        'stream-add-form': StreamAddForm,
         'presentation-import-form': PresentationImportForm,
         'news-feed-add-form': NewsFeedAddForm,
         'stream-list': StreamList,
@@ -103,11 +123,16 @@ export default {
 
     methods: {
         onNewStream(streamId) {
+            this.closeStreamAddModal();
             this.closePresentationImportModal();
         },
 
         onNewNewsFeed(newsFeedId) {
             this.closeNewsFeedAddModal();
+        },
+
+        closeStreamAddModal() {
+            this.$refs.streamAddModal.hide();
         },
 
         closePresentationImportModal() {

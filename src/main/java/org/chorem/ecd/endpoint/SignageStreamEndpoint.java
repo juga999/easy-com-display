@@ -19,7 +19,6 @@ import java.io.InputStream;
 import java.io.File;
 import java.net.HttpURLConnection;
 import java.net.URLConnection;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -62,14 +61,22 @@ public class SignageStreamEndpoint extends Endpoint {
     }
 
     private Object addSignageStream(Request req, Response resp) throws Exception {
-        Map<String, Part> partsMap = getPartsMap(req);
+        UUID streamId;
 
-        Part filePart = partsMap.get("presentationFile");
-        InputStream inputStream = getInputStreamOrNull(filePart);
-        String fileName = Optional.ofNullable(filePart).map(Part::getSubmittedFileName).orElse(null);
-        String streamName = getFormDataStringOrNull(req, "streamName");
+        Part filePart = getPartsMap(req).get("presentationFile");
+        if (filePart != null) {
+            // Création par import d'un fichier
+            InputStream inputStream = getInputStreamOrNull(filePart);
+            String fileName = Optional.ofNullable(filePart).map(Part::getSubmittedFileName).orElse(null);
+            String streamName = getFormDataStringOrNull(req, "streamName");
 
-        UUID streamId = cmsService.importSignageStreamFromPresentation(inputStream, fileName, streamName);
+            streamId = cmsService.importSignageStreamFromPresentation(inputStream, fileName, streamName);
+        } else {
+            // Création d'un flux vide
+            String streamName = getFormDataStringOrNull(req, "streamName");
+
+            streamId = cmsService.addSignageStream(streamName);
+        }
 
         return ImmutableMap.of("streamId", streamId);
     }

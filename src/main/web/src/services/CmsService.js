@@ -82,6 +82,22 @@ export default {
         });
     },
 
+    addStream(streamName) {
+        let formData = new FormData();
+
+        formData.append('streamName', streamName);
+
+        return new Promise(function(resolve, reject) {
+            Vue.http.post(CMS_API_ROOT + 'streams', formData).then((response) => {
+                EventBus.$emit('newStreamEvent', response.body.streamId);
+                resolve(response.body);
+            }, (response) => {
+                console.log(response.body);
+                reject(response.body);
+            });
+        });
+    },
+
     importPresentation(presentationFile, streamName) {
         let formData = new FormData();
 

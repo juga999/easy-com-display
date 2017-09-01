@@ -1,6 +1,7 @@
 package org.chorem.ecd.service;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import org.chorem.ecd.dao.NewsFeedDao;
 import org.chorem.ecd.dao.SignageStreamDao;
 import org.chorem.ecd.dao.TransactionRequired;
@@ -67,6 +68,22 @@ public class CmsService {
     @PostConstruct
     public void init() {
         periodicTasksExecutorService.schedule(getAggregatedNewsBuilderTask());
+    }
+
+    @TransactionRequired
+    public UUID addSignageStream(String streamName) {
+        validateStreamCreationParams(streamName);
+
+        UUID streamId = UUID.randomUUID();
+
+        SignageStream signageStream = new SignageStream();
+        signageStream.setId(streamId);
+        signageStream.setName(streamName);
+        signageStream.setTiming(config.getDefaultStreamTiming());
+        signageStream.setFrames(Lists.newArrayList());
+        signageStreamDao.addSignageStream(signageStream);
+
+        return streamId;
     }
 
     @TransactionRequired
@@ -156,6 +173,12 @@ public class CmsService {
         }
     }
 
+    private void validateStreamCreationParams(String streamName) throws InvalidArgumentException {
+        if (Strings.isNullOrEmpty(streamName)) {
+            throw new InvalidArgumentException("Le flux n'a pas de nom");
+        }
+    }
+
     private void validateStreamImportParams(InputStream inputStream, String fileName, String streamName) throws InvalidArgumentException {
         if (inputStream == null) {
             throw new InvalidArgumentException("Aucun fichier à importer");
@@ -163,9 +186,7 @@ public class CmsService {
         if (Strings.isNullOrEmpty(fileName)) {
             throw new InvalidArgumentException("Le fichier n'a pas de nom");
         }
-        if (Strings.isNullOrEmpty(streamName)) {
-            throw new InvalidArgumentException("Le flux n'a pas de nom");
-        }
+        validateStreamCreationParams(streamName);
     }
 
     private void validateStreamTimingParams(UUID streamId, Integer timing) throws InvalidArgumentException {
