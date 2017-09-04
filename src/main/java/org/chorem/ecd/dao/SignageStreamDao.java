@@ -51,6 +51,14 @@ public class SignageStreamDao extends AbstractDao<SignageStream, UUID> {
                 .execute();
     }
 
+    public void setSignageStreamFrames(UUID streamId, List<SignageStreamFrame> frames) {
+        DSLContext create = dataSource.getSqlContext();
+        create.update(SIGNAGE_STREAM)
+                .set(SIGNAGE_STREAM.FRAMES, gson.toJson(frames))
+                .where(SIGNAGE_STREAM.ID.eq(streamId))
+                .execute();
+    }
+
     @Override
     protected RecordMapper<Record, SignageStream> getRecordMapper() {
         return this::fromRecord;

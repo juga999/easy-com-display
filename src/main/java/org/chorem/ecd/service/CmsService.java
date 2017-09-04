@@ -2,6 +2,7 @@ package org.chorem.ecd.service;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import jdk.internal.util.xml.impl.Input;
 import org.chorem.ecd.dao.NewsFeedDao;
 import org.chorem.ecd.dao.SignageStreamDao;
 import org.chorem.ecd.dao.TransactionRequired;
@@ -71,10 +72,13 @@ public class CmsService {
     }
 
     @TransactionRequired
-    public UUID addSignageStream(String streamName) {
+    public UUID addSignageStream(String streamName) throws IOException {
         validateStreamCreationParams(streamName);
 
         UUID streamId = UUID.randomUUID();
+
+        Path streamPath = getStreamPath(streamId);
+        Files.createDirectories(streamPath);
 
         SignageStream signageStream = new SignageStream();
         signageStream.setId(streamId);
@@ -163,6 +167,25 @@ public class CmsService {
         signageStreamDao.setSignageStreamTiming(streamId, timing);
     }
 
+    @TransactionRequired
+    public void addStreamFrame(UUID streamId, InputStream inputStream, Integer newFrameIndex) throws IOException {
+        validateStreamFrameAdditionParams(inputStream, newFrameIndex);
+
+        Path streamPath = getStreamPath(streamId);
+        Path imagePath = streamPath.resolve(UUID.randomUUID().toString());
+
+        Files.copy(inputStream, imagePath);
+
+        Path thumbnailPath = mediaConverterService.createThumbnail(imagePath);
+
+        SignageStreamFrame frame = new SignageStreamFrame(imagePath.getFileName(), thumbnailPath.getFileName());
+
+        SignageStream signageStream = signageStreamDao.get(streamId);
+        List<SignageStreamFrame> frames = signageStream.getFrames();
+        frames.add(newFrameIndex, frame);
+        signageStreamDao.setSignageStreamFrames(streamId, frames);
+    }
+
     public AggregatedNews getAggregatedNews() {
         try {
             AggregatedNews aggregatedNews = jsonService.loadFromJson(AggregatedNews.class, config.getAggregatedNewsPath());
@@ -195,6 +218,15 @@ public class CmsService {
         }
         if (timing == null) {
             throw new InvalidArgumentException("Aucun minutage spécifié");
+        }
+    }
+
+    private void validateStreamFrameAdditionParams(InputStream inputStream, Integer index) throws InvalidArgumentException {
+        if (inputStream == null) {
+            throw new InvalidArgumentException("Aucun fichier à insérer");
+        }
+        if (index == null) {
+            throw new InvalidArgumentException("Aucun index spécifié");
         }
     }
 

@@ -127,6 +127,7 @@ export default {
 }
 
 .empty-stream-thumbnail {
-    color: #dcdcdc;
+    color: #A9A9A9;
+    vertical-align: middle;
 }
 </style>

@@ -40,6 +40,7 @@ public class SignageStreamEndpoint extends Endpoint {
         Spark.delete(ecdApiPath("/cms/streams/:id"), this::deleteSignageStream, jsonService);
         registerFormDataConsumer(ecdApiPath("/cms/streams"), this::addSignageStream);
         registerFormDataConsumer(ecdApiPath("/cms/streams/timing"), this::setStreamTiming);
+        registerFormDataConsumer(ecdApiPath("/cms/streams/:id/frame"), this::addSignageStreamFrame);
         // Renvoit directement une image
         Spark.get(ecdMediaPath("/streams/:id/:resource"), this::getSignageStreamResource);
     }
@@ -87,6 +88,19 @@ public class SignageStreamEndpoint extends Endpoint {
                 .orElse(null);
         Integer timing = getFormDataIntegerOrNull(req, "timing");
         cmsService.setStreamTiming(streamId, timing);
+
+        return SUCCESS;
+    }
+
+    private Object addSignageStreamFrame(Request req, Response resp) throws Exception {
+        UUID streamId = Optional.ofNullable(getFormDataStringOrNull(req, "streamId"))
+                .map(UUID::fromString)
+                .orElse(null);
+
+        Part filePart = getPartsMap(req).get("imageFile");
+        InputStream inputStream = getInputStreamOrNull(filePart);
+        Integer newFrameIndex = getFormDataIntegerOrNull(req, "newFrameIndex");
+        cmsService.addStreamFrame(streamId, inputStream, newFrameIndex);
 
         return SUCCESS;
     }

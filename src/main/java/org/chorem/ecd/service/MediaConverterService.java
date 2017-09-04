@@ -88,7 +88,7 @@ public class MediaConverterService {
         return frames;
     }
 
-    private Path createThumbnail(Path imagePath) throws IOException {
+    public Path createThumbnail(Path imagePath) throws IOException {
         Path resizedImagePath = getResizedImagePath(imagePath);
         List<String> cmdLineArgs = Arrays.asList(config.getResizeCmd(),
                 "-resize",

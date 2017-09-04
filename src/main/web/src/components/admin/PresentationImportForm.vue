@@ -12,6 +12,7 @@
                       label="Fichier" label-for="presentationFileInput">
             <b-form-file id="presentationFileInput"
                          v-model="presentationFile"
+                         plain
                          choose-label="Choisissez une présentation"
                          placeholder="Aucun fichier choisi">
             </b-form-file>

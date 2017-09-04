@@ -115,6 +115,24 @@ export default {
         });
     },
 
+    addStreamFrame(streamId, newFrameIndex, imageFile) {
+        let formData = new FormData();
+        
+        formData.append('streamId', streamId);
+        formData.append('newFrameIndex', newFrameIndex);
+        formData.append('imageFile', imageFile);
+
+        return new Promise(function(resolve, reject) {
+            Vue.http.post(CMS_API_ROOT + 'streams/' + streamId + '/frame', formData).then((response) => {
+                EventBus.$emit('updatedStreamEvent', streamId);
+                resolve(response.body);
+            }, (response) => {
+                console.log(response.body);
+                reject(response.body);
+            });
+        });
+    },
+
     getNewsFeedList() {
         return Vue.http.get(CMS_API_ROOT + 'newsfeeds').then((response) => {
             let result = response.body;
