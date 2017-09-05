@@ -66,10 +66,8 @@ export default {
 </script>
 
 <style scoped>
-
 .location {
     margin-top: 10px;
     margin-bottom: 10px;
 }
-
 </style>

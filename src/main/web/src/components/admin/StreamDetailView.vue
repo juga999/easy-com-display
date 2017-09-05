@@ -20,7 +20,7 @@
         <div v-if="stream" class="col-md-9 stream-detail-pane">
             <h3>{{stream.name}}</h3>
             <div class="row">
-                <div class="col-md-8 stream-thumbnail-list-wrapper">
+                <div class="col-md-9 stream-thumbnail-list-wrapper">
                     <div class="stream-thumbnail-list">
                         <div v-if="stream.frames.length == 0" class="stream-thumbnail-wrapper">
                             <div class="stream-add-btn">
@@ -38,7 +38,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <b-card header="Minuteur">
 
                         <form @submit.prevent="saveStreamTiming">
@@ -74,6 +74,8 @@
 </template>
 
 <script>
+import { EventBus } from '@/services/EventBus.js';
+
 import CmsService from '@/services/CmsService.js'
 
 import StreamFrameAddForm from '@/components/admin/StreamFrameAddForm.vue'
@@ -94,13 +96,22 @@ export default {
     },
 
     mounted() {
-        CmsService.getStreamDetail(this.streamId).then((stream) => {
-            this.stream = stream;
-            this.streamTiming = stream.timing;
-        })
+        this.getStreamDetail();
+        EventBus.$on('updatedStreamEvent', this.onStreamUpdate);
+    },
+
+    beforeDestroy() {
+        EventBus.$off('updatedStreamEvent', this.onStreamUpdate);
     },
 
     methods: {
+        getStreamDetail() {
+            CmsService.getStreamDetail(this.streamId).then((stream) => {
+                this.stream = stream;
+                this.streamTiming = stream.timing;
+            });
+        },
+
         saveStreamTiming() {
             CmsService.saveStreamTiming(this.streamId, this.streamTiming);
         },
@@ -110,13 +121,19 @@ export default {
             this.$refs.streamFrameAddModal.show();
         },
 
+        onStreamUpdate(streamId) {
+            if (this.streamId === streamId) {
+                this.closeStreamFrameAddModal();
+                this.getStreamDetail();
+            }
+        },
+
         closeStreamFrameAddModal() {
             this.newFrameIndex = null;
             this.$refs.streamFrameAddModal.hide();
         }
     }
 }
-
 </script>
 
 <style scoped>

@@ -65,11 +65,8 @@ export default {
 </script>
 
 <style scoped>
-
 .admin-power-savings {
     margin-top: 10px;
     margin-bottom: 10px;
 }
-
-
 </style>
