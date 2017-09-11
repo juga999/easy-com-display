@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS public.settings
 )
 ALTER TABLE public.settings OWNER TO ecd;
 
-CREATE TABLE public.signage_stream
+CREATE TABLE IF NOT EXISTS public.signage_stream
 (
   id UUID PRIMARY KEY,
   name text UNIQUE NOT NULL,
@@ -21,7 +21,7 @@ CREATE TABLE public.signage_stream
 )
 ALTER TABLE public.settings OWNER TO ecd;
 
-CREATE TABLE public.person
+CREATE TABLE IF NOT EXISTS public.person
 (
   id SERIAL PRIMARY KEY,
   name TEXT
