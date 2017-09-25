@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import CmsService from '@/services/CmsService.js'
+import { cmsService } from '@/services/CmsService.js';
 
 export default {
     data() {
@@ -31,7 +31,7 @@ export default {
     methods: {
         refresh() {
             if (this.newsSources.length === 0 && this.currentSourceNews.length === 0) {
-                CmsService.getAggregatedNewsFeed().then((newsFeeds) => {
+                cmsService.getAggregatedNewsFeed().then((newsFeeds) => {
                     
                     this.newsPerFeed = newsFeeds && newsFeeds.newsPerFeed || {};
                     this.newsSources = Object.keys(this.newsPerFeed);

@@ -33,7 +33,7 @@ public class WeatherEndpoint extends Endpoint {
     }
 
     private Object setLocation(Request req, Response resp) throws Exception {
-        Location location = getFormDataObjectOrNull(req, "location", Location.class);
+        Location location = getObject(req, Location.class);
         weatherService.setLocation(location);
         return SUCCESS;
     }

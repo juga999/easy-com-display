@@ -147,13 +147,12 @@ public class CmsService {
     }
 
     @TransactionRequired
-    public UUID addNewsFeed(String name, String url) {
+    public UUID addNewsFeed(NewsFeed newsFeed) {
+        validateNewsFeed(newsFeed);
+
         UUID newsFeedId = UUID.randomUUID();
 
-        NewsFeed newsFeed = new NewsFeed();
         newsFeed.setId(newsFeedId);
-        newsFeed.setName(name);
-        newsFeed.setUrl(url);
         newsFeedDao.addNewsFeed(newsFeed);
 
         periodicTasksExecutorService.schedule(getAggregatedNewsBuilderTask());
@@ -227,6 +226,15 @@ public class CmsService {
         }
         if (index == null) {
             throw new InvalidArgumentException("Aucun index spécifié");
+        }
+    }
+
+    private void validateNewsFeed(NewsFeed newsFeed) {
+        if (Strings.isNullOrEmpty(newsFeed.getName())) {
+            throw new InvalidArgumentException("Aucun nom spécifié");
+        }
+        if (Strings.isNullOrEmpty(newsFeed.getUrl())) {
+            throw new InvalidArgumentException("Aucune URL spécifiée");
         }
     }
 

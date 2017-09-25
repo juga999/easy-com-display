@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import CmsService from '@/services/CmsService.js'
+import { cmsService } from '@/services/CmsService.js';
 
 export default {
     props: ['streamId', 'newFrameIndex'],
@@ -41,7 +41,7 @@ export default {
             }
 
             this.busy = true;
-            CmsService.addStreamFrame(this.streamId, this.newFrameIndex, this.imageFile)
+            cmsService.addStreamFrame(this.streamId, this.newFrameIndex, this.imageFile)
                 .then((result) => {
                     this.busy = false;
                 });

@@ -1,36 +1,36 @@
-import Vue from 'vue'
-import VueResource from 'vue-resource'
-
 import { EventBus } from '@/services/EventBus.js';
 
-Vue.use(VueResource);
+import  {AbstractService} from '@/services/ServiceUtils.js';
 
-const CMS_API_ROOT = '/api/ecd/cms/'
-const MEDIA_ROOT = '/media/ecd/'
+const CMS_API_ROOT = '/api/ecd/cms/';
+const MEDIA_ROOT = '/media/ecd/';
 
-export default {
+class CmsService extends AbstractService {
 
     getCurrentStreamId() {
-        return Vue.http.get(CMS_API_ROOT + 'current-stream-id').then((response) => {
+        let url = CMS_API_ROOT + 'current-stream-id';
+        return this.get(url).then((response) => {
             let result = response.body;
             return result.streamId || null;
         }, (response) => {
             console.log(response);
             return null;
         });
-    },
+    }
 
     getStreamList() {
-        return Vue.http.get(CMS_API_ROOT + 'streams').then((response) => {
+        let url = CMS_API_ROOT + 'streams';
+        return this.get(url).then((response) => {
             return response.body;
         }, (response) => {
             console.log(response);
             return null;
         });
-    },
+    }
 
     getStreamDetail(streamId) {
-        return Vue.http.get(CMS_API_ROOT + 'streams/' + streamId).then((response) => {
+        let url = CMS_API_ROOT + 'streams/' + streamId;
+        return this.get(url).then((response) => {
             return response.body;
         }, (response) => {
             console.log(response.body);
@@ -38,11 +38,11 @@ export default {
                 status: 'error'
             }
         });
-    },
+    }
 
     getFrameThumbnailSource(stream, index) {
         return MEDIA_ROOT + 'streams/' + stream.id + '/' + stream.frames[index].thumbnail;
-    },
+    }
 
     getFrame(stream, index) {
         if (stream && index < stream.frames.length) {
@@ -52,15 +52,7 @@ export default {
         } else {
             return null;
         }
-    },
-
-    toggleStream(streamId) {
-        let formData = new FormData();
-
-        formData.append('streamId', streamId);
-
-        return Vue.http.post(CMS_API_ROOT + 'streams/toggle', formData);
-    },
+    }
 
     saveStreamTiming(streamId, timing) {
         let formData = new FormData();
@@ -68,11 +60,13 @@ export default {
         formData.append('streamId', streamId);
         formData.append('timing', timing);
 
-        return Vue.http.post(CMS_API_ROOT + 'streams/timing', formData);
-    },
+        const url = CMS_API_ROOT + 'streams/timing'
+        return this.postFormData(url, formData);
+    }
 
     deleteStream(streamId) {
-        return Vue.http.delete(CMS_API_ROOT + 'streams/' + streamId).then((response) => {
+        let url = CMS_API_ROOT + 'streams/' + streamId
+        return this.delete(url).then((response) => {
             return response.body;
         }, (response) => {
             console.log(response.body);
@@ -80,23 +74,22 @@ export default {
                 status: 'error'
             }
         });
-    },
+    }
 
     addStream(streamName) {
         let formData = new FormData();
 
         formData.append('streamName', streamName);
 
-        return new Promise(function(resolve, reject) {
-            Vue.http.post(CMS_API_ROOT + 'streams', formData).then((response) => {
-                EventBus.$emit('newStreamEvent', response.body.streamId);
-                resolve(response.body);
-            }, (response) => {
-                console.log(response.body);
-                reject(response.body);
-            });
+        let url = CMS_API_ROOT + 'streams';
+        return this.postFormData(url, formData).then((response) => {
+            EventBus.$emit('newStreamEvent', response.body.streamId);
+            return response.body;
+        }, (response) => {
+            console.log(response.body);
+            return response.body;
         });
-    },
+    }
 
     importPresentation(presentationFile, streamName) {
         let formData = new FormData();
@@ -104,16 +97,15 @@ export default {
         formData.append('presentationFile', presentationFile);
         formData.append('streamName', streamName);
 
-        return new Promise(function(resolve, reject) {
-            Vue.http.post(CMS_API_ROOT + 'streams', formData).then((response) => {
-                EventBus.$emit('newStreamEvent', response.body.streamId);
-                resolve(response.body);
-            }, (response) => {
-                console.log(response.body);
-                reject(response.body);
-            });
+        let url = CMS_API_ROOT + 'streams';
+        return this.postFormData(url, formData).then((response) => {
+            EventBus.$emit('newStreamEvent', response.body.streamId);
+            return response.body;
+        }, (response) => {
+            console.log(response.body);
+            return response.body;
         });
-    },
+    }
 
     addStreamFrame(streamId, newFrameIndex, imageFile) {
         let formData = new FormData();
@@ -122,46 +114,41 @@ export default {
         formData.append('newFrameIndex', newFrameIndex);
         formData.append('imageFile', imageFile);
 
-        return new Promise(function(resolve, reject) {
-            Vue.http.post(CMS_API_ROOT + 'streams/' + streamId + '/frame', formData).then((response) => {
-                EventBus.$emit('updatedStreamEvent', streamId);
-                resolve(response.body);
-            }, (response) => {
-                console.log(response.body);
-                reject(response.body);
-            });
+        let url = CMS_API_ROOT + 'streams/' + streamId + '/frame';
+        return this.postFormData(url, formData).then((response) => {
+            EventBus.$emit('updatedStreamEvent', streamId);
+            return response.body;
+        }, (response) => {
+            console.log(response.body);
+            return response.body;
         });
-    },
+    }
 
     getNewsFeedList() {
-        return Vue.http.get(CMS_API_ROOT + 'newsfeeds').then((response) => {
+        let url = CMS_API_ROOT + 'newsfeeds';
+        return this.get(url).then((response) => {
             let result = response.body;
             return result;
         }, (response) => {
             console.log(response);
             return null;
         });
-    },
+    }
 
-    addNewsFeed(newsFeedName, newsFeedUrl) {
-        let formData = new FormData();
-
-        formData.append('newsFeedName', newsFeedName);
-        formData.append('newsFeedUrl', newsFeedUrl);
-
-        return new Promise(function(resolve, reject) {
-            Vue.http.post(CMS_API_ROOT + 'newsfeeds', formData).then((response) => {
-                EventBus.$emit('newNewsFeedEvent', response.body.newsFeedId);
-                resolve(response.body);
-            }, (response) => {
-                console.log(response.body);
-                reject(response.body);
-            });
+    addNewsFeed(newsFeed) {
+        let url = CMS_API_ROOT + 'newsfeeds';
+        return this.postJson(url, newsFeed).then((response) => {
+            EventBus.$emit('newNewsFeedEvent', response.body.newsFeedId);
+            return response.body;
+        }, (response) => {
+            console.log(response.body);
+            return response.body;
         });
-    },
+    }
 
     deleteNewsFeed(newsFeedId) {
-        return Vue.http.delete(CMS_API_ROOT + 'newsfeeds/' + newsFeedId).then((response) => {
+        let url = CMS_API_ROOT + 'newsfeeds/' + newsFeedId;
+        return this.delete(url).then((response) => {
             return response.body;
         }, (response) => {
             console.log(response.body);
@@ -169,20 +156,22 @@ export default {
                 status: 'error'
             }
         });
-    },
+    }
 
     getAggregatedNewsFeed() {
-        return Vue.http.get(CMS_API_ROOT + 'news').then((response) => {
+        let url = CMS_API_ROOT + 'news';
+        return this.get(url).then((response) => {
             let result = response.body;
             return result;
         }, (response) => {
             console.log(response);
             return null;
         });
-    },
+    }
 
     getWeatherForecast() {
-        return Vue.http.get(CMS_API_ROOT + 'weather').then((response) => {
+        let url = CMS_API_ROOT + 'weather';
+        return this.get(url).then((response) => {
             let result = response.body;
             return result;
         }, (response) => {
@@ -192,3 +181,5 @@ export default {
     }
 
 }
+
+export const cmsService = new CmsService();

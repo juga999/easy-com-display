@@ -31,7 +31,7 @@
                             <div v-if="index == 0" class="stream-add-btn">
                                 <b-link @click="insertFrame(0)"><i class="fa fa-plus-circle fa-3x"></i></b-link>
                             </div>
-                            <img class="stream-thumbnail" :src="CmsService.getFrameThumbnailSource(stream, index)">
+                            <img class="stream-thumbnail" :src="cmsService.getFrameThumbnailSource(stream, index)">
                             <div class="stream-add-btn">
                                 <b-link @click="insertFrame(index + 1)"><i class="fa fa-plus-circle fa-3x"></i></b-link>
                             </div>
@@ -76,9 +76,9 @@
 <script>
 import { EventBus } from '@/services/EventBus.js';
 
-import CmsService from '@/services/CmsService.js'
+import { cmsService } from '@/services/CmsService.js';
 
-import StreamFrameAddForm from '@/components/admin/StreamFrameAddForm.vue'
+import StreamFrameAddForm from '@/components/admin/StreamFrameAddForm.vue';
 
 export default {
     components: {
@@ -87,7 +87,7 @@ export default {
 
     data() {
         return {
-            CmsService,
+            cmsService,
             streamId: this.$route.params.id,
             stream: null,
             streamTiming: null,
@@ -106,14 +106,14 @@ export default {
 
     methods: {
         getStreamDetail() {
-            CmsService.getStreamDetail(this.streamId).then((stream) => {
+            cmsService.getStreamDetail(this.streamId).then((stream) => {
                 this.stream = stream;
                 this.streamTiming = stream.timing;
             });
         },
 
         saveStreamTiming() {
-            CmsService.saveStreamTiming(this.streamId, this.streamTiming);
+            cmsService.saveStreamTiming(this.streamId, this.streamTiming);
         },
 
         insertFrame(index) {

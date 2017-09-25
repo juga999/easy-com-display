@@ -65,14 +65,31 @@ public abstract class Endpoint {
 
     protected void registerJsonProducer(String path, Route route) {
         Spark.get(path, (Request req, Response resp) ->
-                route.handle(req, withJsonResponseType(resp)),
+                        route.handle(req, withJsonResponseType(resp)),
+                jsonService);
+    }
+
+    protected void registerJsonConsumer(String path, Route route) {
+        Spark.post(path, (Request req, Response resp) ->
+                        route.handle(req, withJsonResponseType(resp)),
+                jsonService);
+    }
+
+    protected void registerJsonDestructor(String path, Route route) {
+        Spark.delete(path, (Request req, Response resp) ->
+                        route.handle(req, withJsonResponseType(resp)),
                 jsonService);
     }
 
     protected void registerFormDataConsumer(String path, Route route) {
         Spark.post(path, "multipart/form-data", (Request req, Response resp) ->
-                route.handle(req, withJsonResponseType(resp)),
+                        route.handle(req, withJsonResponseType(resp)),
                 jsonService);
+    }
+
+    protected <T> T getObject(Request req, Class<T> klass) {
+        T obj = jsonService.getGson().fromJson(req.body(), klass);
+        return obj;
     }
 
     protected Map<String, Part> getPartsMap(Request req) throws Exception {
@@ -102,13 +119,6 @@ public abstract class Endpoint {
                 .map(this::getIntegerOrNull)
                 .orElse(null);
         return value;
-    }
-
-    protected <T> T getFormDataObjectOrNull(Request req, String field, Class<T> classOf) throws Exception {
-        T obj = Optional.ofNullable(getPartsMap(req).get(field))
-                .map(p -> getObjectOrNull(p, classOf))
-                .orElse(null);
-        return obj;
     }
 
     protected InputStream getInputStreamOrNull(Part part) {

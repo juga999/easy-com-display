@@ -20,7 +20,7 @@
 </template>
 
 <script>
-import CmsService from '@/services/CmsService.js'
+import { cmsService } from '@/services/CmsService.js';
 
 export default {
     data() {
@@ -33,7 +33,7 @@ export default {
     methods: {
         addStream() {
             this.busy = true;
-            CmsService.addStream(this.streamName)
+            cmsService.addStream(this.streamName)
                 .then((result) => {
                     this.busy = false;
                 });

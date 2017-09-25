@@ -5,11 +5,11 @@
             <form @submit.prevent="saveLocation">
                 <div class="form-group">
                     <label for="locationName">Ville</label>
-                    <input type="text" v-model="locationName" class="form-control" id="locationName">
+                    <input type="text" v-model="location.name" class="form-control" id="locationName">
                 </div>
                 <div class="form-group">
                     <label for="forecastUrl">Site internet de la météo de la ville</label>
-                    <input type="text" v-model="forecastUrl" class="form-control" id="forecastUrl">
+                    <input type="text" v-model="location.weatherForecastUrl" class="form-control" id="forecastUrl">
                 </div>
 
                 <b-alert :show="saveError != null" variant="danger">
@@ -18,7 +18,7 @@
 
                 <div class="centered-btn-wrapper">
                     <b-button type="submit" class="save-btn"
-                              :disabled="!locationName || !forecastUrl"
+                              :disabled="!location.name || !location.weatherForecastUrl"
                               variant="primary">
                         Enregistrer
                     </b-button>
@@ -29,22 +29,21 @@
 </template>
 
 <script>
-import LocationService from '@/services/LocationService.js'
+import {locationService} from '@/services/LocationService.js'
 
 export default {
     data() {
         return {
             saveError: null,
-            locationName: null,
-            forecastUrl: null,
+            location: {name: null, weatherForecastUrl: null}
         }
     },
 
     mounted() {
-        LocationService.getLocation().then((result) => {
+        locationService.getLocation().then((result) => {
             if (result) {
-                this.locationName = result.name;
-                this.forecastUrl = result.weatherForecastUrl;
+                this.location.name = result.name;
+                this.location.weatherForecastUrl = result.weatherForecastUrl;
             }
         });
     },
@@ -52,7 +51,7 @@ export default {
     methods: {
         saveLocation() {
             this.saveError = null;
-            LocationService.setLocation(this.locationName, this.forecastUrl).then((result) => {
+            locationService.setLocation(this.location).then((result) => {
                 if (!result) {
                     this.saveError = 'La sauvegarde a échoué';
                 }

@@ -3,7 +3,7 @@
         <b-form-group id="newsFeedNameGroup"
                       label="Nom" label-for="newsFeedNameInput">
             <b-form-input id="newsFeedNameInput"
-                          v-model="newsFeedName"
+                          v-model="newsFeed.name"
                           type="text"
                           placeholder="Entrer le nom du flux d'actualités">
             </b-form-input>
@@ -11,7 +11,7 @@
         <b-form-group id="newsFeedUrlGroup"
                       label="Adresse" label-for="newsFeedUrlInput">
             <b-form-input id="newsFeedUrlInput"
-                          v-model="newsFeedUrl"
+                          v-model="newsFeed.url"
                           type="text"
                           placeholder="Entrer l'URL du flux d'actualités">
             </b-form-input>
@@ -19,7 +19,7 @@
 
         <div class="centered-btn-wrapper">
             <b-button type="submit" class="import-btn"
-                        :disabled="!newsFeedName || !newsFeedUrl"
+                        :disabled="!newsFeed.name || !newsFeed.url"
                         variant="primary">
                 Ajouter
             </b-button>
@@ -28,23 +28,21 @@
 </template>
 
 <script>
-import CmsService from '@/services/CmsService.js'
+import { cmsService } from '@/services/CmsService.js';
 
 export default {
     data() {
         return {
-            newsFeedName: '',
-            newsFeedUrl: ''
+            newsFeed: {name: '', url: ''}
         };
     },
 
     methods: {
         addNewsFeed() {
-            if (!this.newsFeedUrl) {
+            if (!this.newsFeed.url) {
                 return;
             }
-
-            CmsService.addNewsFeed(this.newsFeedName, this.newsFeedUrl);
+            cmsService.addNewsFeed(this.newsFeed);
         }
     }
 }

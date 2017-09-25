@@ -37,7 +37,7 @@ public class SignageStreamEndpoint extends Endpoint {
     protected void init() {
         registerJsonProducer(ecdApiPath("/cms/streams"), this::getSignageStreams);
         registerJsonProducer(ecdApiPath("/cms/streams/:id"), this::getSignageStream);
-        Spark.delete(ecdApiPath("/cms/streams/:id"), this::deleteSignageStream, jsonService);
+        registerJsonDestructor(ecdApiPath("/cms/streams/:id"), this::deleteSignageStream);
         registerFormDataConsumer(ecdApiPath("/cms/streams"), this::addSignageStream);
         registerFormDataConsumer(ecdApiPath("/cms/streams/timing"), this::setStreamTiming);
         registerFormDataConsumer(ecdApiPath("/cms/streams/:id/frame"), this::addSignageStreamFrame);

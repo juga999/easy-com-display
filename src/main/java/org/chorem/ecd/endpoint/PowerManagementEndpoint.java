@@ -20,7 +20,7 @@ public class PowerManagementEndpoint extends Endpoint {
     @Override
     protected void init() {
         registerJsonProducer(ecdApiPath("/settings/tv-times"), this::getTvTimes);
-        registerFormDataConsumer(ecdApiPath("/settings/tv-times"), this::setTvTimes);
+        registerJsonConsumer(ecdApiPath("/settings/tv-times"), this::setTvTimes);
     }
 
     private Object getTvTimes(Request req, Response resp) {
@@ -28,7 +28,7 @@ public class PowerManagementEndpoint extends Endpoint {
     }
 
     private Object setTvTimes(Request req, Response resp) throws Exception {
-        TvTimes tvTimes = getFormDataObjectOrNull(req, "tvTimes", TvTimes.class);
+        TvTimes tvTimes = getObject(req, TvTimes.class);
         powerManagementService.setTvTimes(tvTimes);
         return SUCCESS;
     }

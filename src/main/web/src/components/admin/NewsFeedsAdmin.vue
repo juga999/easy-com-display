@@ -39,7 +39,7 @@
 <script>
 import { EventBus } from '@/services/EventBus.js';
 
-import CmsService from '@/services/CmsService.js'
+import { cmsService } from '@/services/CmsService.js';
 
 import NewsFeedAddForm from '@/components/admin/NewsFeedAddForm.vue'
 
@@ -65,13 +65,13 @@ export default {
 
     methods: {
         getNewsFeedList() {
-            return CmsService.getNewsFeedList().then((newsFeedList) => {
+            return cmsService.getNewsFeedList().then((newsFeedList) => {
                 this.newsFeedList = newsFeedList;
             });
         },
 
         deleteNewsFeed(newsFeedId) {
-            return CmsService.deleteNewsFeed(newsFeedId).then(() => {
+            return cmsService.deleteNewsFeed(newsFeedId).then(() => {
                 return this.getNewsFeedList();
             })
         },

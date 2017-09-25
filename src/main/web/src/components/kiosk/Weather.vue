@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import CmsService from '@/services/CmsService.js'
+import { cmsService } from '@/services/CmsService.js';
 
 export default {
     data() {
@@ -39,7 +39,7 @@ export default {
 
     methods: {
         refresh() {
-            CmsService.getWeatherForecast().then((forecast) => {
+            cmsService.getWeatherForecast().then((forecast) => {
                 this.weatherForecast = forecast;
             })
         }

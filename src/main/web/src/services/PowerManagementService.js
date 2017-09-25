@@ -1,31 +1,21 @@
-import Vue from 'vue'
-import VueResource from 'vue-resource'
-
-Vue.use(VueResource);
+import {AbstractService} from '@/services/ServiceUtils.js'
 
 const SETTINGS_API_ROOT = '/api/ecd/settings/'
 
-export default {
+class PowerManagementService extends AbstractService {
 
     getTvTimes() {
-        return Vue.http.get(SETTINGS_API_ROOT + 'tv-times').then((response) => {
+        return this.get(SETTINGS_API_ROOT + 'tv-times').then((response) => {
             let result = response.body;
             return result;
         }, (response) => {
             console.log(response);
             return null;
         })
-    },
+    }
 
-    setTvTimes(wakeupTime, sleepTime) {
-        let formData = new FormData();
-
-        formData.append('tvTimes', JSON.stringify({
-            wakeupTime: wakeupTime || '',
-            sleepTime: sleepTime || ''
-        }));
-
-        return Vue.http.post(SETTINGS_API_ROOT + 'tv-times', formData).then((response) => {
+    setTvTimes(tvTimes) {
+        return this.postJson(SETTINGS_API_ROOT + 'tv-times', tvTimes).then((response) => {
             return true;
         }, (response) => {
             console.log(response);
@@ -34,3 +24,5 @@ export default {
     }
 
 }
+
+export const powerManagementService = new PowerManagementService();

@@ -1,15 +1,14 @@
 package org.chorem.ecd.endpoint;
 
+import com.google.common.base.Verify;
 import com.google.common.collect.ImmutableMap;
+import org.chorem.ecd.model.news.NewsFeed;
 import org.chorem.ecd.service.CmsService;
 import spark.Request;
 import spark.Response;
-import spark.Spark;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import javax.servlet.http.Part;
-import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -25,8 +24,8 @@ public class NewsFeedEndpoint extends Endpoint {
     protected void init() {
         registerJsonProducer(ecdApiPath("/cms/news"), this::getNews);
         registerJsonProducer(ecdApiPath("/cms/newsfeeds"), this::getNewsFeeds);
-        registerFormDataConsumer(ecdApiPath("/cms/newsfeeds"), this::addNewsFeed);
-        Spark.delete(ecdApiPath("/cms/newsfeeds/:id"), this::deleteNewsFeed, jsonService);
+        registerJsonConsumer(ecdApiPath("/cms/newsfeeds"), this::addNewsFeed);
+        registerJsonDestructor(ecdApiPath("/cms/newsfeeds/:id"), this::deleteNewsFeed);
     }
 
     private Object getNews(Request req, Response resp) {
@@ -38,12 +37,10 @@ public class NewsFeedEndpoint extends Endpoint {
     }
 
     private Object addNewsFeed(Request req, Response resp) throws Exception {
-        Map<String, Part> partsMap = getPartsMap(req);
+        NewsFeed newsFeed = getObject(req, NewsFeed.class);
+        Verify.verifyNotNull(newsFeed);
 
-        String newsFeedName = getFormDataStringOrNull(req, "newsFeedName");
-        String newsFeedUrl = getFormDataStringOrNull(req, "newsFeedUrl");
-
-        UUID newsFeedId = cmsService.addNewsFeed(newsFeedName, newsFeedUrl);
+        UUID newsFeedId = cmsService.addNewsFeed(newsFeed);
 
         return ImmutableMap.of("newsFeedId", newsFeedId);
     }
@@ -51,7 +48,7 @@ public class NewsFeedEndpoint extends Endpoint {
     private Object deleteNewsFeed(Request req, Response resp) {
         UUID id = UUID.fromString(req.params("id"));
         cmsService.deleteNewsFeed(id);
-        withJsonResponseType(resp);
+
         return SUCCESS;
     }
 }

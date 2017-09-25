@@ -20,7 +20,8 @@
 
 <script>
 import Q from 'q'
-import CmsService from '@/services/CmsService.js'
+
+import { cmsService } from '@/services/CmsService.js';
 
 import Clock from './Clock.vue'
 import NewsTicker from './NewsTicker.vue'
@@ -67,7 +68,7 @@ export default {
             if (this.$route.params.id) {
                 return Q(this.$route.params.id);
             } else {
-                return CmsService.getCurrentStreamId().then((streamId) => {
+                return cmsService.getCurrentStreamId().then((streamId) => {
                     return streamId;
                 });
             }
@@ -75,7 +76,7 @@ export default {
 
         getStreamDetail(streamId) {
             if (streamId) {
-                return CmsService.getStreamDetail(streamId).then((stream) => {
+                return cmsService.getStreamDetail(streamId).then((stream) => {
                     this.stream = stream;
                     return this.stream;
                 });
@@ -104,7 +105,7 @@ export default {
         },
 
         _advanceSlideShow() {
-            let frame = CmsService.getFrame(this.stream, this.currentFrameIndex);
+            let frame = cmsService.getFrame(this.stream, this.currentFrameIndex);
             if (frame) {
                 this.frameContainerStyle['background-image'] = frame.url;
                 ++this.currentFrameIndex;

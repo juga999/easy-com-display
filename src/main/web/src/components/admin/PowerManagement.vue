@@ -5,11 +5,11 @@
             <form @submit.prevent="saveTvHours">
                 <div class="form-group">
                     <label for="wakeupTime">Heure d'allumage</label>
-                    <input type="time" v-model="wakeupTime" class="form-control" id="wakeupTime">
+                    <input type="time" v-model="tvTimes.wakeupTime" class="form-control" id="wakeupTime">
                 </div>
                 <div class="form-group">
                     <label for="sleepTime">Heure de mise en veille</label>
-                    <input type="time" v-model="sleepTime" class="form-control" id="sleepTime">
+                    <input type="time" v-model="tvTimes.sleepTime" class="form-control" id="sleepTime">
                 </div>
 
                 <b-alert :show="saveError != null" variant="danger">
@@ -18,7 +18,7 @@
 
                 <div class="centered-btn-wrapper">
                     <b-button type="submit" class="save-btn"
-                              :disabled="!wakeupTime || !sleepTime"
+                              :disabled="!tvTimes.wakeupTime || !tvTimes.sleepTime"
                               variant="primary">
                         Enregistrer
                     </b-button>
@@ -29,22 +29,21 @@
 </template>
 
 <script>
-import PowerManagementService from '@/services/PowerManagementService.js'
+import { powerManagementService } from '@/services/PowerManagementService.js'
 
 export default {
     data() {
         return {
             saveError: null,
-            wakeupTime: null,
-            sleepTime: null
+            tvTimes: {wakeupTime: null, sleepTime: null}
         }
     },
 
     mounted() {
-        PowerManagementService.getTvTimes().then((result) => {
+        powerManagementService.getTvTimes().then((result) => {
             if (result) {
-                this.wakeupTime = result.wakeupTime;
-                this.sleepTime = result.sleepTime;
+                this.tvTimes.wakeupTime = result.wakeupTime;
+                this.tvTimes.sleepTime = result.sleepTime;
             }
         });
     },
@@ -52,7 +51,7 @@ export default {
     methods: {
         saveTvHours() {
             this.saveError = null;
-            PowerManagementService.setTvTimes(this.wakeupTime, this.sleepTime).then((result) => {
+            powerManagementService.setTvTimes(this.tvTimes).then((result) => {
                 if (!result) {
                     this.saveError = 'La sauvegarde a échoué';
                 }

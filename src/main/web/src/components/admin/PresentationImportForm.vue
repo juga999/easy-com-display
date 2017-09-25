@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import CmsService from '@/services/CmsService.js'
+import { cmsService } from '@/services/CmsService.js';
 
 export default {
     data() {
@@ -47,7 +47,7 @@ export default {
             }
 
             this.busy = true;
-            CmsService.importPresentation(this.presentationFile, this.streamName)
+            cmsService.importPresentation(this.presentationFile, this.streamName)
                 .then((result) => {
                     this.busy = false;
                 });

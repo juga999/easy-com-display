@@ -14,7 +14,7 @@
         <div v-for="stream in streamList" class="admin-stream-item-wrapper">
             <div class="admin-stream-item-thumbnail">
                 <router-link :to="{ name: 'stream-detail', params: { id: stream.id }}">
-                    <img v-if="stream.frames.length > 0" :src="CmsService.getFrameThumbnailSource(stream, 0)">
+                    <img v-if="stream.frames.length > 0" :src="cmsService.getFrameThumbnailSource(stream, 0)">
                     <span v-if="stream.frames.length == 0" class="empty-stream-thumbnail"><i class="fa fa-folder fa-5x"></i></span>
                 </router-link>
             </div>
@@ -83,10 +83,10 @@
 <script>
 import { EventBus } from '@/services/EventBus.js';
 
-import CmsService from '@/services/CmsService.js'
+import { cmsService } from '@/services/CmsService.js';
 
-import StreamAddForm from '@/components/admin/StreamAddForm.vue'
-import PresentationImportForm from '@/components/admin/PresentationImportForm.vue'
+import StreamAddForm from '@/components/admin/StreamAddForm.vue';
+import PresentationImportForm from '@/components/admin/PresentationImportForm.vue';
 
 export default {
     components: {
@@ -96,7 +96,7 @@ export default {
 
     data() {
         return {
-            CmsService,
+            cmsService,
             streamList: null,
             currentStreamId: null,
             streamToDelete: null
@@ -114,7 +114,7 @@ export default {
 
     methods: {
         getStreamList() {
-            return CmsService.getStreamList().then((streamList) => {
+            return cmsService.getStreamList().then((streamList) => {
                 this.streamList = streamList;
             });
         },
@@ -129,7 +129,7 @@ export default {
         },
 
         deleteStream() {
-            return CmsService.deleteStream(this.streamToDelete.id).then(() => {
+            return cmsService.deleteStream(this.streamToDelete.id).then(() => {
                 return this.getStreamList()
             });
         },
