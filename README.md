@@ -17,9 +17,9 @@ CREATE USER ecd WITH PASSWORD 'ecd';
 CREATE DATABASE ecd OWNER ecd;
 ```
 
-Il faut ensuite lancer le script contenu dans `src/main/resources/initDb.sql` pour initialiser la base de données.
+Il faut ensuite lancer les migrations de la base de données:
 ```
-psql -d ecd -U ecd -f {PATH_ECD}/src/main/resources/initDb.sql
+mvn flyway:migrate
 ```
 
 Installation des dépendances du frontend

@@ -180,6 +180,28 @@
       </plugin>
 
       <plugin>
+        <groupId>org.flywaydb</groupId>
+        <artifactId>flyway-maven-plugin</artifactId>
+        <version>4.2.0</version>
+        <configuration>
+          <url>jdbc:postgresql:ecd</url>
+          <user>ecd</user>
+          <password>ecd</password>
+          <schemas>
+            <schema>ecd_app</schema>
+          </schemas>
+          <baselineVersion>1</baselineVersion>
+        </configuration>
+        <dependencies>
+          <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>${postgresDriverVersion}</version>
+          </dependency>
+        </dependencies>
+      </plugin>
+
+      <plugin>
         <groupId>org.jooq</groupId>
         <artifactId>jooq-codegen-maven</artifactId>
         <version>${jooqVersion}</version>
@@ -211,7 +233,7 @@
               <name>org.jooq.util.postgres.PostgresDatabase</name>
               <includes>.*</includes>
               <excludes></excludes>
-              <inputSchema>public</inputSchema>
+              <inputSchema>ecd_app</inputSchema>
             </database>
             <target>
               <packageName>org.chorem.ecd.mapping</packageName>
