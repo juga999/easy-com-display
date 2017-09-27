@@ -6,6 +6,8 @@ import org.chorem.ecd.model.settings.TvTimes;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
+import org.jooq.impl.DSL;
+import org.jooq.util.postgres.PostgresDataType;
 
 import javax.enterprise.context.ApplicationScoped;
 
@@ -42,43 +44,28 @@ public class SettingsDao extends AbstractDao<Settings, Integer> {
     }
 
     public void setTvTimes(TvTimes tvTimes) {
-        String tvTimesJson = gson.toJson(tvTimes);
+        Object value = DSL.cast(gson.toJson(tvTimes), PostgresDataType.JSON);
         DSLContext create = dataSource.getSqlContext();
         create.insertInto(SETTINGS, SETTINGS.ID, SETTINGS.TV_TIMES)
-                .values(1, tvTimesJson)
+                .values(1, value)
                 .onDuplicateKeyUpdate()
-                .set(SETTINGS.TV_TIMES, tvTimesJson)
+                .set(SETTINGS.TV_TIMES, value)
                 .execute();
     }
 
     public void setLocation(Location location) {
-        String locationJson = gson.toJson(location);
+        Object value = DSL.cast(gson.toJson(location), PostgresDataType.JSON);
         DSLContext create = dataSource.getSqlContext();
         create.insertInto(SETTINGS, SETTINGS.ID, SETTINGS.LOCATION)
-                .values(1, locationJson)
+                .values(1, value)
                 .onDuplicateKeyUpdate()
-                .set(SETTINGS.LOCATION, locationJson)
+                .set(SETTINGS.LOCATION, value)
                 .execute();
     }
 
     @Override
     protected RecordMapper<Record, Settings> getRecordMapper() {
-        return this::fromRecord;
+        throw new UnsupportedOperationException();
     }
 
-    protected Settings fromRecord(Record record) {
-        Settings settings = new Settings();
-
-        Location location = Optional.ofNullable(record.get(SETTINGS.LOCATION))
-                .map(json -> gson.fromJson(json, Location.class))
-                .orElse(null);
-        settings.setLocation(location);
-
-        TvTimes tvTimes = Optional.ofNullable(record.get(SETTINGS.TV_TIMES))
-                .map(json -> gson.fromJson(json, TvTimes.class))
-                .orElse(null);
-        settings.setTvTimes(tvTimes);
-
-        return settings;
-    }
 }

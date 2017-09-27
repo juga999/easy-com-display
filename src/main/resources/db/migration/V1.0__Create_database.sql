@@ -1,8 +1,8 @@
 CREATE TABLE ecd_app.settings
 (
   id integer PRIMARY KEY,
-  location text,
-  tv_times text
+  location json,
+  tv_times json
 );
 
 CREATE TABLE ecd_app.signage_stream
