@@ -6,8 +6,11 @@
                 <div slot="header" class="admin-view-title">Administration</div>
                 <b-card-body class="admin-view-menu">
                     <b-list-group>
-                        <b-list-group-item key="admin" to="/admin/cms">
-                            <i class="fa fa-photo"></i>&nbsp;&nbsp;Gestion du contenu
+                        <b-list-group-item key="staging" to="/kiosk/playlist">
+                            <i class="fa fa-photo"></i>&nbsp;&nbsp;Playlist
+                        </b-list-group-item>
+                        <b-list-group-item key="cms" to="/admin/cms">
+                            <i class="fa fa-database"></i>&nbsp;&nbsp;Gestion du contenu
                         </b-list-group-item>
                         <b-list-group-item key="settings" to="/admin/settings">
                             <i class="fa fa-gear"></i>&nbsp;&nbsp;Configuration de l'afficheur

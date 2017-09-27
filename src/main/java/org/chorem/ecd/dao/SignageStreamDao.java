@@ -6,7 +6,10 @@ import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
 import org.chorem.ecd.model.stream.SignageStreamFrame;
-import org.chorem.ecd.mapping.tables.records.SignageStreamRecord;
+import org.jooq.impl.DSL;
+import org.jooq.util.postgres.PostgresDataType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 
@@ -24,6 +27,8 @@ import static org.chorem.ecd.mapping.tables.SignageStream.SIGNAGE_STREAM;
 @ApplicationScoped
 public class SignageStreamDao extends AbstractDao<SignageStream, UUID> {
 
+    private static final Logger logger = LoggerFactory.getLogger(SignageStreamDao.class);
+
     private final Type framesListType = new TypeToken<List<SignageStreamFrame>>(){}.getType();
 
     public SignageStreamDao() {
@@ -32,15 +37,10 @@ public class SignageStreamDao extends AbstractDao<SignageStream, UUID> {
 
     public void addSignageStream(SignageStream signageStream) {
         DSLContext create = dataSource.getSqlContext();
-        SignageStreamRecord record = create.newRecord(SIGNAGE_STREAM);
-        record.setId(signageStream.getId());
-        record.setName(signageStream.getName());
-        record.setTiming(signageStream.getTiming());
         Timestamp now = Timestamp.from(Instant.now());
-        record.setCreationDateTime(now);
-        record.setLastUpdateDateTime(now);
-        record.setFrames(gson.toJson(signageStream.getFrames()));
-        record.store();
+        create.insertInto(SIGNAGE_STREAM, SIGNAGE_STREAM.ID, SIGNAGE_STREAM.NAME, SIGNAGE_STREAM.TIMING, SIGNAGE_STREAM.CREATION_DATE_TIME, SIGNAGE_STREAM.LAST_UPDATE_DATE_TIME, SIGNAGE_STREAM.FRAMES)
+                .values(signageStream.getId(), signageStream.getName(), signageStream.getTiming(), now, now, DSL.cast(gson.toJson(signageStream.getFrames()), PostgresDataType.JSON))
+                .execute();
     }
 
     public void setSignageStreamTiming(UUID streamId, Integer timing) {
@@ -54,7 +54,7 @@ public class SignageStreamDao extends AbstractDao<SignageStream, UUID> {
     public void setSignageStreamFrames(UUID streamId, List<SignageStreamFrame> frames) {
         DSLContext create = dataSource.getSqlContext();
         create.update(SIGNAGE_STREAM)
-                .set(SIGNAGE_STREAM.FRAMES, gson.toJson(frames))
+                .set(SIGNAGE_STREAM.FRAMES, (Object)DSL.cast(gson.toJson(frames), PostgresDataType.JSON))
                 .where(SIGNAGE_STREAM.ID.eq(streamId))
                 .execute();
     }
@@ -66,6 +66,7 @@ public class SignageStreamDao extends AbstractDao<SignageStream, UUID> {
 
     protected SignageStream fromRecord(Record record) {
         SignageStream signageStream = new SignageStream();
+
         signageStream.setId(record.get(SIGNAGE_STREAM.ID));
         signageStream.setName(record.get(SIGNAGE_STREAM.NAME));
         signageStream.setTiming(record.get(SIGNAGE_STREAM.TIMING));
@@ -76,7 +77,7 @@ public class SignageStreamDao extends AbstractDao<SignageStream, UUID> {
         timestamp = record.get(SIGNAGE_STREAM.LAST_UPDATE_DATE_TIME);
         signageStream.setLastUpdateDateTime(timestamp.toLocalDateTime());
 
-        String framesJson = record.get(SIGNAGE_STREAM.FRAMES);
+        String framesJson = record.get(SIGNAGE_STREAM.FRAMES).toString();
         signageStream.setFrames(gson.fromJson(framesJson, framesListType));
 
         return signageStream;

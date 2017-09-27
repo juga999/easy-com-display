@@ -7,17 +7,6 @@ const MEDIA_ROOT = '/media/ecd/';
 
 class CmsService extends AbstractService {
 
-    getCurrentStreamId() {
-        let url = CMS_API_ROOT + 'current-stream-id';
-        return this.get(url).then((response) => {
-            let result = response.body;
-            return result.streamId || null;
-        }, (response) => {
-            console.log(response);
-            return null;
-        });
-    }
-
     getStreamList() {
         let url = CMS_API_ROOT + 'streams';
         return this.get(url).then((response) => {

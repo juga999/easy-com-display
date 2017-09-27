@@ -32,6 +32,18 @@ public class EcdConfig {
         }
     }
 
+    public String getDataSourceUrl() {
+        return props.getProperty("ecd.datasource.url");
+    }
+
+    public String getDataSourceLogin() {
+        return props.getProperty("ecd.datasource.login");
+    }
+
+    public String getDataSourcePwd() {
+        return props.getProperty("ecd.datasource.pwd");
+    }
+
     public String getApiPathPrefix() {
         return "/api/ecd";
     }

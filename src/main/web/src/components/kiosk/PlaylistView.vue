@@ -1,6 +1,6 @@
 <template>
     <div class="stream-view-wrapper">
-        <div v-if="stream" class="frame-container" :style="frameContainerStyle">
+        <div v-if="playlist" class="frame-container" :style="frameContainerStyle">
         </div>
         <div class="right-panel">
             <div class="clock-wrapper">
@@ -22,6 +22,7 @@
 import Q from 'q'
 
 import { cmsService } from '@/services/CmsService.js';
+import { playlistService } from '@/services/PlaylistService.js';
 
 import Clock from './Clock.vue'
 import NewsTicker from './NewsTicker.vue'
@@ -36,7 +37,9 @@ export default {
 
     data() {
         return {
-            stream: null,
+            playlist: null,
+            streams: [],
+            currentStreamIndex: 0,
             currentFrameIndex: 0,
             frameContainerStyle: {
                 position: 'absolute',
@@ -64,53 +67,49 @@ export default {
     },
 
     methods: {
-        getStreamId() {
-            return Q(this.$route.params.id);
-        },
-
-        getStreamDetail(streamId) {
-            if (streamId) {
-                return cmsService.getStreamDetail(streamId).then((stream) => {
-                    this.stream = stream;
-                    return this.stream;
-                });
-            } else {
-                this.stream = null;
-                return Q(this.stream);
-            }
+        getPlaylist() {
+            return playlistService.getPlaylist().then((playlist) => {
+                this.playlist = playlist;
+                return this.playlist;
+            });
         },
 
         refresh() {
-            if (this.currentFrameIndex > 0) {
+            if (this.currentStreamIndex === 0 && this.currentFrameIndex === 0) {
+                this.getPlaylist().then((playlist) => {
+                    this.streams = playlist.streams;
+                    if (this.streams.length > 0) {
+                        let delay = this._advanceSlideShow();
+                        this.timeoutId = window.setTimeout(() => this.refresh(), delay);
+                    } else {
+                        this.timeoutId = window.setTimeout(() => this.refresh(), 1500);
+                    }
+                });
+            } else {
                 let delay = this._advanceSlideShow();
                 this.timeoutId = window.setTimeout(() => this.refresh(), delay);
-            } else {
-                this.getStreamId()
-                    .then((streamId) => this.getStreamDetail(streamId))
-                    .then(() => {
-                        if (this.stream) {
-                            let delay = this._advanceSlideShow();
-                            this.timeoutId = window.setTimeout(() => this.refresh(), delay);
-                        } else {
-                            this.timeoutId = window.setTimeout(() => this.refresh(), 1500);
-                        }
-                    });
             }
         },
 
         _advanceSlideShow() {
-            let frame = cmsService.getFrame(this.stream, this.currentFrameIndex);
+            let stream = this.streams[this.currentStreamIndex];
+            let frame = cmsService.getFrame(stream, this.currentFrameIndex);
             if (frame) {
                 this.frameContainerStyle['background-image'] = frame.url;
                 ++this.currentFrameIndex;
-                if (this.currentFrameIndex === this.stream.frames.length) {
+                if (this.currentFrameIndex === stream.frames.length) {
                     this.currentFrameIndex = 0;
+                    ++this.currentStreamIndex;
+                }
+                if (this.currentStreamIndex === this.streams.length) {
+                    this.currentStreamIndex = 0;
                 }
             } else {
                 this.currentFrameIndex = 0;
+                this.currentFrameIndex = 0;
             }
 
-            let delay = frame && frame.delay || this.stream.timing;
+            let delay = frame && frame.delay || stream.timing;
 
             return delay * 1000;
         }

@@ -5,6 +5,7 @@ import CmsAdminView from '@/components/admin/CmsAdminView.vue'
 import SettingsAdminView from '@/components/admin/SettingsAdminView.vue'
 import StreamDetailView from '@/components/admin/StreamDetailView.vue'
 import StreamView from  '@/components/kiosk/StreamView.vue'
+import PlaylistView from '@/components/kiosk/PlaylistView.vue'
 
 Vue.use(Router)
 
@@ -29,6 +30,11 @@ export default new Router({
       path: '/kiosk/show-stream/:id',
       name: 'stream-view',
       component: StreamView
+    },
+    {
+      path: '/kiosk/playlist',
+      name: 'playlist-view',
+      component: PlaylistView
     },
     // catch all redirect
     {

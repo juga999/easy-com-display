@@ -1,12 +1,14 @@
 package org.chorem.ecd.service;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import jdk.internal.util.xml.impl.Input;
 import org.chorem.ecd.dao.NewsFeedDao;
+import org.chorem.ecd.dao.PlaylistDao;
 import org.chorem.ecd.dao.SignageStreamDao;
 import org.chorem.ecd.dao.TransactionRequired;
 import org.chorem.ecd.exception.InvalidArgumentException;
+import org.chorem.ecd.model.Playlist;
 import org.chorem.ecd.model.news.AggregatedNews;
 import org.chorem.ecd.model.news.NewsFeed;
 import org.chorem.ecd.model.stream.SignageStream;
@@ -47,6 +49,9 @@ public class CmsService {
     protected SignageStreamDao signageStreamDao;
 
     @Inject
+    protected PlaylistDao playlistDao;
+
+    @Inject
     protected NewsFeedDao newsFeedDao;
 
     @Inject
@@ -68,7 +73,8 @@ public class CmsService {
 
     @PostConstruct
     public void init() {
-        periodicTasksExecutorService.schedule(getAggregatedNewsBuilderTask());
+        Playlist playlist = playlistDao.getPlaylist();
+        periodicTasksExecutorService.schedule(getAggregatedNewsBuilderTask(playlist));
     }
 
     @TransactionRequired
@@ -93,6 +99,9 @@ public class CmsService {
     @TransactionRequired
     public void deleteSignageStream(UUID id) {
         signageStreamDao.delete(id);
+
+        Playlist playlist = playlistDao.getPlaylist();
+        playlistDao.removeStreamId(playlist, id);
 
         Path streamPath = getStreamPath(id);
         deleteDirectory(streamPath);
@@ -143,7 +152,8 @@ public class CmsService {
     public void deleteNewsFeed(UUID id) {
         newsFeedDao.delete(id);
 
-        periodicTasksExecutorService.schedule(getAggregatedNewsBuilderTask());
+        Playlist playlist = playlistDao.getPlaylist();
+        playlistDao.removeNewsFeedId(playlist, id);
     }
 
     @TransactionRequired
@@ -154,8 +164,6 @@ public class CmsService {
 
         newsFeed.setId(newsFeedId);
         newsFeedDao.addNewsFeed(newsFeed);
-
-        periodicTasksExecutorService.schedule(getAggregatedNewsBuilderTask());
 
         return newsFeedId;
     }
@@ -183,6 +191,49 @@ public class CmsService {
         List<SignageStreamFrame> frames = signageStream.getFrames();
         frames.add(newFrameIndex, frame);
         signageStreamDao.setSignageStreamFrames(streamId, frames);
+    }
+
+    public Playlist getPlaylist() {
+        Playlist playlist = playlistDao.getPlaylist();
+        return playlist;
+    }
+
+    @TransactionRequired
+    public Playlist addPlaylistStream(UUID streamId) {
+        Preconditions.checkNotNull(streamId);
+        Playlist playlist = playlistDao.getPlaylist();
+        playlistDao.addStreamId(playlist, streamId);
+        return playlist;
+    }
+
+    @TransactionRequired
+    public Playlist removePlaylistStream(UUID streamId) {
+        Preconditions.checkNotNull(streamId);
+        Playlist playlist = playlistDao.getPlaylist();
+        playlistDao.removeStreamId(playlist, streamId);
+        return playlist;
+    }
+
+    @TransactionRequired
+    public Playlist addPlaylistNewsFeed(UUID newsFeedId) {
+        Preconditions.checkNotNull(newsFeedId);
+        Playlist playlist = playlistDao.getPlaylist();
+        playlistDao.addNewsFeedId(playlist, newsFeedId);
+
+        periodicTasksExecutorService.schedule(getAggregatedNewsBuilderTask(playlist));
+
+        return playlist;
+    }
+
+    @TransactionRequired
+    public Playlist removePlaylistNewsFeed(UUID newsFeedId) {
+        Preconditions.checkNotNull(newsFeedId);
+        Playlist playlist = playlistDao.getPlaylist();
+        playlistDao.removeNewsFeedId(playlist, newsFeedId);
+
+        periodicTasksExecutorService.schedule(getAggregatedNewsBuilderTask(playlist));
+
+        return playlist;
     }
 
     public AggregatedNews getAggregatedNews() {
@@ -242,8 +293,8 @@ public class CmsService {
         return config.getStreamsPath().resolve(streamId.toString());
     }
 
-    private AggregatedNewsBuilderPeriodicTask getAggregatedNewsBuilderTask() {
-        List<URL> newsFeedUrls = newsFeedDao.findAll().stream()
+    private AggregatedNewsBuilderPeriodicTask getAggregatedNewsBuilderTask(Playlist playlist) {
+        List<URL> newsFeedUrls = playlist.getNewsFeeds().stream()
                 .map(NewsFeed::getParsedUrl)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
