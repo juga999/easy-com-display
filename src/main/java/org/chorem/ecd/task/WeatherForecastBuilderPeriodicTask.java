@@ -1,17 +1,21 @@
 package org.chorem.ecd.task;
 
+import com.google.common.collect.Range;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import org.apache.commons.io.IOUtils;
 import org.chorem.ecd.model.weather.WeatherForecast;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.File;
-import java.net.URISyntaxException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -21,23 +25,29 @@ public class WeatherForecastBuilderPeriodicTask extends EcdPeriodicTask {
 
     private static final Logger logger = LoggerFactory.getLogger(WeatherForecastBuilderPeriodicTask.class);
 
-    private final URL forecastUrl;
+    private URL forecastUrl;
 
     public static final String NAME = "WeatherForecastBuilder";
 
-    private static final int TIMEOUT_MS = 10 * 1000;
+    private static final Range<Integer> MORNING_RANGE = Range.closed(4, 12);
+    private static final Range<Integer> AFTERNOON_RANGE = Range.closed(13, 18);
 
-    public WeatherForecastBuilderPeriodicTask(URL forecastUrl) {
-        this.forecastUrl = forecastUrl;
+    public WeatherForecastBuilderPeriodicTask(String forecastUrl) {
+        String url = forecastUrl.replace("/meteo/localite/", "/services/json/");
+        try {
+            this.forecastUrl = new URL(url);
+        } catch (MalformedURLException e) {
+            logger.error(e.getMessage(), e);
+        }
     }
 
     @Override
     public void run() {
-        WeatherForecast forecast = fetchWeatherForecast();
-
         try {
+            WeatherForecast forecast = fetchWeatherForecast();
+            Files.deleteIfExists(config.getWeatherForecastPath());
             jsonService.saveToJson(forecast, config.getWeatherForecastPath());
-        } catch (IOException e) {
+        } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
     }
@@ -64,50 +74,49 @@ public class WeatherForecastBuilderPeriodicTask extends EcdPeriodicTask {
         }
 
         try {
-            Document document;
-            if (forecastUrl.getProtocol().startsWith("file")) {
-                document = Jsoup.parse(new File(forecastUrl.toURI()), StandardCharsets.ISO_8859_1.name());
-            } else {
-                document = Jsoup.parse(forecastUrl, TIMEOUT_MS);
-            }
-            Element forecastElt = document.select("div#previs_quart_jour_0").first();
-            if (forecastElt != null) {
-                forecast = parseForecast(forecastElt);
-            }
-        } catch (URISyntaxException | IOException e) {
+            InputStream inputStream = forecastUrl.openStream();
+            String jsonData = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
+            JsonParser jsonParser = new JsonParser();
+            JsonElement jsonElement = jsonParser.parse(jsonData);
+            forecast = parseForecast(jsonElement);
+        } catch (IOException e) {
             logger.error(e.getMessage(), e);
         }
 
         return forecast;
     }
 
-    private WeatherForecast parseForecast(Element forecastElt) {
-        Element dayPeriodElt = forecastElt.select("div.nom_quart_jour").first();
-        String dayPeriod = dayPeriodElt.text();
+    private WeatherForecast parseForecast(JsonElement rootElement) {
+        int hourOfDay = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
+        if (hourOfDay < 23) {
+            hourOfDay += 1;
+        }
+        String hourOfDayMemberName = String.format("%dH00", hourOfDay);
+        JsonObject hourlyDataJsonObject = rootElement.getAsJsonObject()
+                .get("fcst_day_0").getAsJsonObject()
+                .get("hourly_data").getAsJsonObject()
+                .get(hourOfDayMemberName).getAsJsonObject();
 
-        Element tempElt = forecastElt.select("div.tempe").first();
-        String temperature = tempElt.text();
+        String condition = hourlyDataJsonObject.get("CONDITION").getAsString();
+        String temperature = String.valueOf(hourlyDataJsonObject.get("TMP2m").getAsFloat()) + "\u00b0";
+        String humidity = String.valueOf(hourlyDataJsonObject.get("RH2m").getAsFloat());
 
-        Element feltTempElt = forecastElt.select("div.ressentie").first();
-        String feltTemperature = feltTempElt.text();
 
-        Element skyElt = forecastElt.select("span.phrase_ciel").first();
-        String sky = skyElt.text();
-
-        Element rainElt = forecastElt.select("span.phrase_precip").first();
-        String rain = rainElt.text();
-
-        Element windElt = forecastElt.select("div.phrase_dir_vent").first();
-        String wind = windElt.text();
+        String period;
+        if (MORNING_RANGE.contains(hourOfDay)) {
+            period = "morning";
+        } else if (AFTERNOON_RANGE.contains(hourOfDay)) {
+            period = "afternoon";
+        } else {
+            period = "evening";
+        }
 
         WeatherForecast forecast = new WeatherForecast();
-        forecast.setPeriod(dayPeriod);
+        forecast.setProvider("www.prevision-meteo.ch");
+        forecast.setPeriod(period);
+        forecast.setSky(condition);
         forecast.setTemperature(temperature);
-        forecast.setFeltTemperature(feltTemperature);
-        forecast.setSky(sky);
-        forecast.setRain(rain);
-        forecast.setWind(wind);
-
+        forecast.setHumidity(humidity);
         return forecast;
     }
 

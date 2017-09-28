@@ -2,7 +2,7 @@
     <div class="weather">
         <div v-if="weatherForecast && weatherForecast.period">
             <div class="day-period">
-                {{weatherForecast.period.toUpperCase()}}
+                {{translatedPeriod.toUpperCase()}}
             </div>
             <div class="temperature-wrapper">
                 <span class="temperature">{{weatherForecast.temperature}}</span>
@@ -34,6 +34,18 @@ export default {
     beforeDestroy() {
         if (this.refreshId) {
             window.clearInterval(this.refreshId);
+        }
+    },
+
+    computed: {
+        translatedPeriod() {
+            if (this.weatherForecast.period === 'morning') {
+                return 'Matin';
+            } else if (this.weatherForecast.period === 'afternoon') {
+                return 'Après-midi';
+            } else {
+                return 'Soirée';
+            }
         }
     },
 

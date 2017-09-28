@@ -1,13 +1,10 @@
 <template>
-    <div class="location">
-        <b-card header="<i class='fa fa-cloud'></i> Emplacement">
+    <div class="weather">
+        <h3>Météo</h3>
+        <b-card>
             <form @submit.prevent="saveLocation">
                 <div class="form-group">
-                    <label for="locationName">Ville</label>
-                    <input type="text" v-model="location.name" class="form-control" id="locationName">
-                </div>
-                <div class="form-group">
-                    <label for="forecastUrl">Site internet de la météo de la ville</label>
+                    <label for="forecastUrl">Lien vers la page <a target="_blank" href="https://www.prevision-meteo.ch">Previsionmeteo.ch</a> de la ville</label>
                     <input type="text" v-model="location.weatherForecastUrl" class="form-control" id="forecastUrl">
                 </div>
 
@@ -17,7 +14,7 @@
 
                 <div class="centered-btn-wrapper">
                     <b-button type="submit" class="save-btn"
-                              :disabled="!location.name || !location.weatherForecastUrl"
+                              :disabled="!location.weatherForecastUrl"
                               variant="primary">
                         Enregistrer
                     </b-button>
@@ -34,14 +31,13 @@ export default {
     data() {
         return {
             saveError: null,
-            location: {name: null, weatherForecastUrl: null}
+            location: {weatherForecastUrl: null}
         }
     },
 
     mounted() {
         locationService.getLocation().then((result) => {
             if (result) {
-                this.location.name = result.name;
                 this.location.weatherForecastUrl = result.weatherForecastUrl;
             }
         });
@@ -64,7 +60,7 @@ export default {
 </script>
 
 <style scoped>
-.location {
+.weather {
     margin-top: 10px;
     margin-bottom: 10px;
 }

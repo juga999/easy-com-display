@@ -1,8 +1,5 @@
 package org.chorem.ecd.model.settings;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
 /**
  * @author Julien Gaston (gaston@codelutin.com)
  */
@@ -39,15 +36,6 @@ public class Location {
 
     public String getWeatherForecastUrl() {
         return weatherForecastUrl;
-    }
-
-    public URL getWeatherForecastParsedUrl() {
-        URL parsedUrl = null;
-        try {
-            parsedUrl = new URL(getWeatherForecastUrl());
-        } catch (MalformedURLException e) {
-        }
-        return parsedUrl;
     }
 
     public void setWeatherForecastUrl(String weatherForecastUrl) {

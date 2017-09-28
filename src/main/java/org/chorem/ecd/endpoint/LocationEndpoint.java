@@ -20,18 +20,12 @@ public class LocationEndpoint extends Endpoint {
     @Override
     protected void init() {
         registerJsonProducer(ecdApiPath("/cms/weather"), this::getWeatherForecast);
-        registerJsonConsumer(ecdApiPath("/settings/search-location"), this::searchLocation);
         registerJsonProducer(ecdApiPath("/settings/location"), this::getLocation);
         registerFormDataConsumer(ecdApiPath("/settings/location"), this::setLocation);
     }
 
     private Object getWeatherForecast(Request request, Response response) {
         return locationService.getWeatherForecast();
-    }
-
-    private Object searchLocation(Request request, Response response) {
-        String name = getObject(request, LocationName.class).getName();
-        return locationService.searchLocation(name);
     }
 
     private Object getLocation(Request req, Response resp) {

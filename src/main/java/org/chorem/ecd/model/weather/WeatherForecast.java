@@ -5,6 +5,8 @@ package org.chorem.ecd.model.weather;
  */
 public class WeatherForecast {
 
+    private String provider;
+
     private String period;
 
     private String temperature;
@@ -17,7 +19,17 @@ public class WeatherForecast {
 
     private String wind;
 
+    private String humidity;
+
     public WeatherForecast() {
+    }
+
+    public String getProvider() {
+        return provider;
+    }
+
+    public void setProvider(String provider) {
+        this.provider = provider;
     }
 
     public String getPeriod() {
@@ -68,4 +80,11 @@ public class WeatherForecast {
         this.wind = wind;
     }
 
+    public String getHumidity() {
+        return humidity;
+    }
+
+    public void setHumidity(String humidity) {
+        this.humidity = humidity;
+    }
 }
