@@ -49,6 +49,10 @@
             </tbody>
         </table>
     </div>
+    
+    <empty-content v-if="!streamList || orderedStreams.length == 0"
+        message="Vous n'avez pas de fil d'annonces">
+    </empty-content>
 
     <!-- Modal pour ajouter un flux d'annonces -->
     <b-modal id="streamAddModal"
@@ -108,11 +112,13 @@ import { playlistService } from '@/services/PlaylistService.js';
 
 import StreamAddForm from '@/components/admin/StreamAddForm.vue';
 import PresentationImportForm from '@/components/admin/PresentationImportForm.vue';
+import EmptyContent from '@/components/admin/EmptyContent.vue';
 
 export default {
     components: {
         'stream-add-form': StreamAddForm,
-        'presentation-import-form': PresentationImportForm
+        'presentation-import-form': PresentationImportForm,
+        'empty-content': EmptyContent
     },
 
     data() {

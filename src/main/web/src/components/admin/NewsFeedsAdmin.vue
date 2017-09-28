@@ -35,6 +35,10 @@
         </table>
     </div>
 
+    <empty-content v-if="!newsFeed || newsFeedList.length == 0"
+        message="Vous n'avez pas de flux d'actualités">
+    </empty-content
+
     <!-- Modal pour ajouter un flux RSS -->
     <b-modal id="newsFeedAddModal"
              ref="newsFeedAddModal"
@@ -57,10 +61,12 @@ import { cmsService } from '@/services/CmsService.js';
 import { playlistService } from '@/services/PlaylistService.js';
 
 import NewsFeedAddForm from '@/components/admin/NewsFeedAddForm.vue'
+import EmptyContent from '@/components/admin/EmptyContent.vue';
 
 export default {
     components: {
-        'news-feed-add-form': NewsFeedAddForm
+        'news-feed-add-form': NewsFeedAddForm,
+        'empty-content': EmptyContent
     },
 
     data() {
