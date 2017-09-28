@@ -1,7 +1,6 @@
 <template>
     <div class="admin-power-savings">
-        <h3>Gestion de l'énergie</h3>
-        <b-card header="<i class='fa fa-tv'></i> Téléviseur">
+        <b-card header="<i class='fa fa-tv'></i> Gestion de l'énergie">
             <form @submit.prevent="saveTvHours">
                 <div class="form-group">
                     <label for="wakeupTime">Heure d'allumage</label>

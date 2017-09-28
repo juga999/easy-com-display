@@ -1,7 +1,7 @@
 package org.chorem.ecd.endpoint;
 
 import org.chorem.ecd.model.settings.Location;
-import org.chorem.ecd.service.WeatherService;
+import org.chorem.ecd.service.LocationService;
 import spark.Request;
 import spark.Response;
 
@@ -12,29 +12,47 @@ import javax.inject.Inject;
  * @author Julien Gaston (gaston@codelutin.com)
  */
 @ApplicationScoped
-public class WeatherEndpoint extends Endpoint {
+public class LocationEndpoint extends Endpoint {
 
     @Inject
-    protected WeatherService weatherService;
+    protected LocationService locationService;
 
     @Override
     protected void init() {
         registerJsonProducer(ecdApiPath("/cms/weather"), this::getWeatherForecast);
+        registerJsonConsumer(ecdApiPath("/settings/search-location"), this::searchLocation);
         registerJsonProducer(ecdApiPath("/settings/location"), this::getLocation);
         registerFormDataConsumer(ecdApiPath("/settings/location"), this::setLocation);
     }
 
     private Object getWeatherForecast(Request request, Response response) {
-        return weatherService.getWeatherForecast();
+        return locationService.getWeatherForecast();
+    }
+
+    private Object searchLocation(Request request, Response response) {
+        String name = getObject(request, LocationName.class).getName();
+        return locationService.searchLocation(name);
     }
 
     private Object getLocation(Request req, Response resp) {
-        return weatherService.getLocation();
+        return locationService.getLocation();
     }
 
     private Object setLocation(Request req, Response resp) throws Exception {
         Location location = getObject(req, Location.class);
-        weatherService.setLocation(location);
+        locationService.setLocation(location);
         return SUCCESS;
+    }
+
+    private static final class LocationName {
+        private String name;
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
     }
 }

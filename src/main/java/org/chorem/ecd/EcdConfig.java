@@ -66,6 +66,10 @@ public class EcdConfig {
         return props.getProperty("ecd.cmd.resize");
     }
 
+    public String getLocationSearchUrlFormat() {
+        return props.getProperty("ecd.location.searchUrlFormat");
+    }
+
     public Integer getDefaultStreamTiming() {
         return Integer.valueOf(props.getProperty("ecd.default.streamTiming"));
     }
@@ -81,4 +85,5 @@ public class EcdConfig {
     public Path getWeatherForecastPath() {
         return Paths.get(getDataDir(), WEATHER_DIR, "forecast.json");
     }
+
 }

@@ -1,7 +1,6 @@
 <template>
     <div class="location">
-        <h3>Emplacement</h3>
-        <b-card header="<i class='fa fa-cloud'></i> Météo">
+        <b-card header="<i class='fa fa-cloud'></i> Emplacement">
             <form @submit.prevent="saveLocation">
                 <div class="form-group">
                     <label for="locationName">Ville</label>
