@@ -176,71 +176,30 @@
         <configuration>
           <source>${javaVersion}</source>
           <target>${javaVersion}</target>
+          <excludes>
+            <exclude>
+              **/org/chorem/ecd/Generate.java
+            </exclude>
+          </excludes>
         </configuration>
       </plugin>
 
       <plugin>
-        <groupId>org.flywaydb</groupId>
-        <artifactId>flyway-maven-plugin</artifactId>
-        <version>4.2.0</version>
-        <configuration>
-          <url>jdbc:postgresql:ecd</url>
-          <user>ecd</user>
-          <password>ecd</password>
-          <schemas>
-            <schema>ecd_app</schema>
-          </schemas>
-          <baselineVersion>1</baselineVersion>
-        </configuration>
-        <dependencies>
-          <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>${postgresDriverVersion}</version>
-          </dependency>
-        </dependencies>
-      </plugin>
-
-      <plugin>
-        <groupId>org.jooq</groupId>
-        <artifactId>jooq-codegen-maven</artifactId>
-        <version>${jooqVersion}</version>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
         <executions>
           <execution>
+            <phase>generate-sources</phase>
             <goals>
-              <goal>generate</goal>
+              <goal>add-source</goal>
             </goals>
+            <configuration>
+              <sources>
+                <source>${project.build.directory}/generated-sources/jooq</source>
+              </sources>
+            </configuration>
           </execution>
         </executions>
-        <dependencies>
-          <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>${postgresDriverVersion}</version>
-          </dependency>
-        </dependencies>
-        <configuration>
-          <!-- JDBC connection parameters -->
-          <jdbc>
-            <driver>org.postgresql.Driver</driver>
-            <url>jdbc:postgresql:ecd</url>
-            <user>ecd</user>
-            <password>ecd</password>
-          </jdbc>
-          <!-- Generator parameters -->
-          <generator>
-            <database>
-              <name>org.jooq.util.postgres.PostgresDatabase</name>
-              <includes>.*</includes>
-              <excludes></excludes>
-              <inputSchema>ecd_app</inputSchema>
-            </database>
-            <target>
-              <packageName>org.chorem.ecd.mapping</packageName>
-              <directory>target/generated-sources/jooq</directory>
-            </target>
-          </generator>
-        </configuration>
       </plugin>
 
       <plugin>

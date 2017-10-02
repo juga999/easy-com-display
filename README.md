@@ -1,13 +1,13 @@
-# EasyComDisplay - Self hosted and flexible digital signage solution for the RaspberryPi
+# EasyComDisplay - Self hosted and flexible digital signage solution for the Raspberry Pi
 
 EasyComDisplay is a web application for the display and management of information for small and medium organisations.
-EasyComDisplay targets the RaspberryPi as its main platform, but other Linux environments can be used as well.
+EasyComDisplay targets the Raspberry Pi as its main platform, but other Linux environments can be used as well.
 
 ## Requirements
 
 ### Java 8
 EasyComDisplay requires Java 8 to run.
-For the RaspberryPi, the official Raspbian distribution ships with a Java SE environment.
+For the Raspberry Pi, the official Raspbian distribution ships with a Java SE environment.
 
 ### PostgreSQL
 EasyComDisplay stores its metadata in a PostgreSQL database.
@@ -27,10 +27,10 @@ GRANT ALL PRIVILEGES ON DATABASE ecd TO ecd;
 
 ### LibreOffice and Universal Office Converter (unoconv)
 Those two applications are required to import presentations made with Microsoft Powerpoint or LibreOffice Impress.
-For the RaspberryPi, the official Raspbian distribution already ships with LibreOffice.
+For the Raspberry Pi, the official Raspbian distribution already ships with LibreOffice.
 
 EasyComDisplay 'talks' to LibreOffice through the unoconv (http://dag.wiee.rs/home-made/unoconv/) application.
-To install unoconv on the RaspberryPi:
+To install unoconv on the Raspberry Pi:
 ```
 sudo apt-get install unoconv
 ```
@@ -77,9 +77,10 @@ TODO
 
 See the requirements above for the PostgreSQL database configuration.
 
-Type the following command to create the ecd_app database schema:
+Before building the application, some sources must be generated with these commands:
 ```
-mvn flyway:migrate
+mvn -f pom-for-generation.xml compile
+mvn -f pom-for-generation.xml exec:java -Dexec.mainClass="org.chorem.ecd.Generate"
 ```
 
 ## Frontend development
