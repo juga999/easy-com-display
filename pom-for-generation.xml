@@ -14,6 +14,7 @@
         <postgresDriverVersion>42.1.1</postgresDriverVersion>
         <jooqVersion>3.9.5</jooqVersion>
         <slf4jVersion>1.7.13</slf4jVersion>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <dependencies>

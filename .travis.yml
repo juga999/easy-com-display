@@ -1,0 +1,43 @@
+# Author: jgaston@codelutin.com
+
+language: java
+
+jdk:
+  - oraclejdk8
+
+cache:
+  directories:
+    - $HOME/.m2
+
+env:
+  - NODE_VERSION="6"
+
+before_install:
+  - nvm install $NODE_VERSION
+  - node --version
+  - npm --version
+
+script:
+  - export GIT_TAG=`git describe --abbrev=0 --tags`
+  - echo "$GIT_TAG"
+  - cd src/main/web
+  - npm install
+  - npm run build
+  - cd $TRAVIS_BUILD_DIR
+  - mvn -f pom-for-generation.xml compile
+  - mvn -f pom-for-generation.xml exec:java -Dexec.mainClass="org.chorem.ecd.Generate"
+  - mvn package -P prod
+  - cd target
+  - tar cvzf ecd-app-$GIT_TAG.tgz ecd-app
+  - cd $TRAVIS_BUILD_DIR
+
+install: true
+
+deploy:
+  provider: releases
+  api_key: $GITHUB_TOKEN
+  skip_cleanup: true
+  file: target/ecd-app-$GIT_TAG.tgz
+  on:
+    tags: true
+
